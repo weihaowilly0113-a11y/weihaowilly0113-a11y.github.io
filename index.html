@@ -1,0 +1,1318 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wei Hao Huang｜UI/UX 設計師</title>
+<meta name="description" content="UI/UX 設計師黃威皓（Wei Hao Huang）的作品集：網站改版、互動設計、形象網站與桌遊設計。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* 品牌色：黃色只放在群青底上 */
+    --blue: #2B3BFF;
+    --yellow: #FFE600;
+    --paper: #F7F3EC;
+    --ink: #111111;
+    --white: #FFFFFF;
+    --muted: #55534E;
+
+    --gutter: clamp(16px, 4vw, 56px);
+    --radius-sheet: clamp(28px, 4vw, 56px);
+    --peek: clamp(56px, 8svh, 84px);   /* 主視覺底下露出一點作品區，暗示可以往下滑 */
+    --font-display: "Archivo", "Noto Sans TC", system-ui, sans-serif;
+    --font-body: "Noto Sans TC", "Archivo", system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--blue);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  a { color: inherit; }
+  ul { list-style: none; }
+  :focus-visible { outline: 3px solid var(--yellow); outline-offset: 4px; border-radius: 4px; }
+  .sheet :focus-visible { outline-color: var(--blue); }
+
+  /* ---------- 頁首 ---------- */
+  .site-header {
+    position: fixed; inset: 0 0 auto 0; z-index: 20;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px var(--gutter);
+    color: var(--white);
+    transition: background-color .25s, color .25s;
+  }
+  .site-header.is-paper {
+    background: rgba(247, 243, 236, .92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--ink);
+  }
+  .brand {
+    font-family: var(--font-display);
+    font-weight: 900; font-stretch: 125%;
+    font-size: 15px; letter-spacing: .02em;
+    text-decoration: none;
+  }
+  .site-nav { display: flex; gap: clamp(16px, 3vw, 32px); }
+  .site-nav a { font-weight: 500; font-size: 15px; text-decoration: none; }
+  .site-nav a:hover { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px; }
+
+  /* ---------- 主視覺：整片群青，捲動時被米白區塊蓋過 ---------- */
+  .hero {
+    position: sticky; top: 0;
+    height: calc(100vh - var(--peek)); height: calc(100svh - var(--peek));
+    overflow: hidden;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 104px var(--gutter) 0;
+    color: var(--white);
+    background-color: var(--blue);
+    background-image: repeating-linear-gradient(90deg, rgba(255,255,255,.12) 0 1px, transparent 1px calc(100% / 6));
+  }
+  .hero-intro {
+    max-width: 34em;
+    position: relative; z-index: 100000;   /* 文字永遠在字母和貼紙前面 */
+    pointer-events: none;                   /* 但不擋滑鼠：文字後面的貼紙照樣抓得到 */
+  }
+  .hero-role { font-weight: 900; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.25; color: var(--yellow); }
+  .hero-role .latin { font-family: var(--font-display); font-weight: 800; font-stretch: 100%; }   /* 中文字型的 í、ó 聲調位置會跑掉，改用英文字型 */
+  .hero-lede { margin-top: 14px; font-size: clamp(18px, 2vw, 26px); line-height: 1.6; font-weight: 500; text-wrap: pretty; }   /* 避免最後一行只剩一兩個字 */
+
+  .hero-name {
+    font-family: var(--font-display);
+    font-weight: 900; font-stretch: 125%;
+    color: var(--yellow);
+    font-size: min(17vw, 34svh);
+    line-height: .8;
+    letter-spacing: -.02em;
+    white-space: nowrap;
+    margin-left: -.05em;
+    margin-right: calc(var(--gutter) * -1);   /* 讓字一路超出到畫面右緣 */
+    margin-bottom: 0;   /* 字的底邊對齊地板，跟物理世界的地板一致，下方的立體厚度也看得到 */
+  }
+  .hero-name .line { display: block; padding-top: .04em; }
+
+  /* 桌機：名字三行、靠右下角對齊，左下角留給貼紙堆 */
+  @media (min-width: 761px) {
+    .hero-name {
+      /* 恢復原本的大小（17vw）；畫面比較矮時，依高度縮小，避免三行塞不下 */
+      font-size: min(17vw, calc((100svh - var(--peek) - 130px) / 2.45));
+      position: absolute; right: var(--gutter); bottom: 0;
+      text-align: right;
+      margin: 0;
+    }
+    .hero-name .line:first-child .word { display: block; }
+  }
+  .hero-name.is-intro .line { overflow: hidden; }   /* 只在開場動畫時裁切，之後字母才能被拖出去 */
+  .hero-name:not(.is-intro) .word { animation: none; transform: none; }   /* 動畫結束後拿掉，字母拖到貼紙上時才會疊在上面 */
+  .hero-name .word { display: inline-block; }
+
+  /* 立體字：黃色字面後面疊出黑色的厚度 */
+  .ch {
+    display: inline-block;
+    position: relative;
+    text-shadow:
+      .006em .006em 0 var(--ink), .012em .012em 0 var(--ink),
+      .018em .018em 0 var(--ink), .024em .024em 0 var(--ink),
+      .030em .030em 0 var(--ink), .036em .036em 0 var(--ink),
+      .042em .042em 0 var(--ink), .048em .048em 0 var(--ink);
+  }
+
+  /* ---------- 可以拖動的字母與貼紙 ---------- */
+  [data-drag] {
+    transform: translate(var(--x, 0px), var(--y, 0px)) rotate(var(--r, 0deg));
+    cursor: grab;
+    touch-action: none;
+    user-select: none; -webkit-user-select: none;
+  }
+  [data-drag].is-dragging {
+    cursor: grabbing;
+    transform: translate(var(--x, 0px), var(--y, 0px)) rotate(calc(var(--r, 0deg) + 4deg)) scale(1.06);
+    filter: drop-shadow(.06em .1em 0 rgba(0, 0, 0, .35));
+  }
+  .sticker.is-dragging { filter: drop-shadow(0 18px 18px rgba(0, 0, 0, .35)); }
+  .is-measuring [data-drag] { transform: none !important; transition: none !important; }
+  .is-resetting .ch { transition: transform .6s cubic-bezier(.2,.8,.2,1); }
+  /* 手機上字母太大，拖曳會擋住捲動，所以只讓貼紙能拖 */
+  @media (pointer: coarse) {
+    .ch[data-drag] { touch-action: auto; cursor: auto; }
+  }
+
+  .sticker {
+    position: absolute; z-index: 3;
+    left: var(--lx); top: var(--ty);
+    font-size: clamp(14px, min(1.25vw, 1.9svh), 19px);
+    font-weight: 900; line-height: 1.1;
+    display: grid; place-items: center; text-align: center;
+    border: .3em solid var(--white);
+    filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .28));
+  }
+  .sticker-latin { font-family: var(--font-display); font-stretch: 125%; }
+  .st-circle { width: 6.2em; height: 6.2em; border-radius: 50%; background: var(--yellow); color: var(--ink); font-size: clamp(16px, min(1.6vw, 2.3svh), 24px); }
+  .st-pill { padding: .7em 1.3em; border-radius: 999px; background: var(--white); color: var(--blue); border-color: var(--white); outline: 2px solid var(--blue); outline-offset: -.55em; }
+  .st-hint { padding: .6em 1.1em; border-radius: .5em; background: var(--yellow); color: var(--ink); }
+  .st-star { border: 0; width: 7.4em; height: 7.4em; color: var(--ink); }
+  .st-star svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .st-star polygon { fill: var(--paper); stroke: var(--white); stroke-width: 6; stroke-linejoin: round; paint-order: stroke; }
+  .st-star span { position: relative; }
+
+
+  /* 頭像與標誌貼紙 */
+  .st-avatar { width: 7em; height: 7em; border-radius: 50%; background: var(--white); overflow: hidden; }
+  .st-avatar img { width: 100%; height: 100%; display: block; pointer-events: none; }
+  /* 工具標誌：LobeHub 的 Avatar 樣式（圓形品牌色底＋圖示） */
+  .st-logo { width: 4.6em; height: 4.6em; border-radius: 50%; font-size: clamp(16px, min(1.5vw, 2.2svh), 22px); }
+  .st-logo svg { pointer-events: none; }
+  .st-logo-figma { background: #000; border-radius: .9em; }
+  .st-logo-figma svg { width: 62%; height: 62%; }
+  .st-logo-claude { background: #D97757; }
+  .st-logo-claude svg { width: 75%; height: 75%; }
+  .st-logo-github { background: #000; }
+  .st-logo-github svg { width: 75%; height: 75%; }
+  .st-pill-logo { padding: .75em 1.1em; border-radius: 999px; background: var(--white); font-size: clamp(16px, min(1.5vw, 2.2svh), 22px); }
+  .st-pill-logo svg { height: 1.7em; width: auto; display: block; pointer-events: none; }
+  .st-pill-logo-wide { padding: 1em 1.3em; }
+  .st-pill-logo-wide svg { height: 1.15em; }
+  .st-canva { width: 4.6em; height: 4.6em; border-radius: 50%; padding: 0; overflow: hidden; font-size: clamp(16px, min(1.5vw, 2.2svh), 22px); }
+  .st-canva svg { width: 100%; height: 100%; display: block; pointer-events: none; }
+  /* 螢光貼紙：高彩度的螢光紙，帶一點外光暈；表面的反光會隨貼紙的角度和位置移動，平常也會偶爾閃過一道光 */
+  .st-neon {
+    --neon: #FF3FA4; --glow: rgba(255, 63, 164, .65);
+    padding: 0; overflow: hidden;
+    border: 0;
+    background: var(--neon); color: var(--ink);
+    font-size: clamp(16px, min(1.5vw, 2.2svh), 22px);
+    filter: drop-shadow(0 0 .5em var(--glow)) drop-shadow(0 6px 8px rgba(0, 0, 0, .28));
+  }
+  .st-neon img { width: 100%; height: 100%; display: block; pointer-events: none; }
+  .st-neon::after {   /* 跟著角度移動的反光 */
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,.5) 50%, transparent 60%);
+    background-size: 300% 100%;
+    background-position: calc(var(--sheen, 35) * 1%) 0;
+    mix-blend-mode: screen;
+  }
+  .st-neon::before {  /* 偶爾閃過的一道光 */
+    content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(110deg, transparent 42%, rgba(255,255,255,.75) 50%, transparent 58%);
+    transform: translateX(-120%);
+    mix-blend-mode: screen;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .st-neon::before { animation: glint 7s ease-in-out 2.5s infinite; }
+    .st-neon-job::before { animation-delay: 5.5s; }
+    @keyframes glint { 0% { transform: translateX(-120%); } 14%, 100% { transform: translateX(120%); } }
+  }
+  .st-neon.is-dragging { filter: drop-shadow(0 0 .7em var(--glow)) drop-shadow(0 18px 18px rgba(0, 0, 0, .35)); }
+  .st-neon-monster { width: 7.4em; height: 7.4em; border-radius: 1.1em; }
+  .st-neon-tag {
+    --neon: #3CFF4E; --glow: rgba(60, 255, 78, .6);
+    padding: .8em 1.2em; border-radius: .6em; font-size: clamp(18px, min(1.8vw, 2.6svh), 28px);
+  }
+  .st-neon-tag span { position: relative; }
+  .st-neon-job {
+    --neon: #FF6A13; --glow: rgba(255, 106, 19, .7);
+    display: grid; justify-items: center; gap: .15em;
+    padding: .7em 1.3em .75em; border-radius: 999px;
+  }
+  .st-neon-job b { position: relative; font-size: 1.5em; font-weight: 900; line-height: 1; letter-spacing: .06em; }
+  .st-neon-job small { position: relative; font-family: var(--font-display); font-weight: 700; font-size: .78em; line-height: 1; }
+  .st-img.st-avatar-cut { width: 7.5em; }
+  .st-img.is-dragging {
+    filter: drop-shadow(3px 0 0 var(--white)) drop-shadow(-3px 0 0 var(--white)) drop-shadow(0 3px 0 var(--white)) drop-shadow(0 -3px 0 var(--white)) drop-shadow(0 18px 18px rgba(0,0,0,.35));
+  }
+  .stickers-waiting .sticker { visibility: hidden; }   /* 等開場時從上方掉下來 */
+
+  /* 圖片貼紙：放自己畫的貼紙或官方標誌（去背 PNG／SVG），白邊和陰影會自動加上
+     用法：<img class="sticker st-img" data-drag src="檔名.png" alt="貼紙：說明" style="--lx:..;--ty:..;--mx:..;--my:..;--r:..">  */
+  .st-img { border: 0; width: 7em; height: auto; background: none;
+    filter: drop-shadow(0 0 0 var(--white)) drop-shadow(3px 0 0 var(--white)) drop-shadow(-3px 0 0 var(--white)) drop-shadow(0 3px 0 var(--white)) drop-shadow(0 -3px 0 var(--white)) drop-shadow(0 6px 8px rgba(0,0,0,.28)); }
+
+  .hint-touch { display: none; }
+  @media (pointer: coarse) { .hint-mouse { display: none; } .hint-touch { display: inline; } }
+
+  /* 重來一次：立體按壓按鈕。平常底下有一塊黑色厚度，按下去時按鈕往下沉、厚度消失 */
+  .reset {
+    margin-top: 22px;
+    font: inherit; font-size: clamp(15px, 1.25vw, 18px); font-weight: 700; line-height: 1;
+    color: var(--ink); background: var(--yellow);
+    border: 2px solid var(--ink); border-radius: 999px;
+    padding: .8em 1.6em;
+    box-shadow: 0 .33em 0 var(--ink);
+    cursor: pointer;
+    opacity: 0; pointer-events: none;
+    transition: transform .08s ease-out, box-shadow .08s ease-out, opacity .2s;
+  }
+  .hero.is-moved .reset { opacity: 1; pointer-events: auto; }   /* 按鈕本身還是可以按 */
+  .reset:active { transform: translateY(.33em); box-shadow: 0 0 0 var(--ink); }     /* 按下去：沉到底，厚度消失 */
+  .reset:focus-visible { outline-color: var(--white); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-name .word { transform: translateY(105%); animation: rise .9s cubic-bezier(.2,.8,.2,1) forwards; }
+    .hero-name .word:nth-of-type(2) { animation-delay: .08s; }
+    .hero-name .line:nth-child(2) .word { animation-delay: .16s; }
+    @keyframes rise { to { transform: translateY(0); } }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  /* ---------- 米白內容區 ---------- */
+  .sheet {
+    position: relative; z-index: 2;
+    background-color: var(--paper);
+    background-image: repeating-linear-gradient(90deg, rgba(43,59,255,.07) 0 1px, transparent 1px calc(100% / 6));
+    border-radius: var(--radius-sheet);
+    padding: clamp(64px, 9vw, 128px) var(--gutter) clamp(72px, 10vw, 140px);
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-weight: 900; font-stretch: 125%;
+    color: var(--blue);
+    font-size: clamp(44px, 7vw, 104px);
+    line-height: 1;
+    margin-bottom: clamp(32px, 5vw, 64px);
+  }
+
+  /* 作品列表 */
+  .work {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(24px, 4vw, 64px);
+    padding: clamp(28px, 4vw, 48px) 0 clamp(48px, 6vw, 88px);
+    border-top: 2px solid var(--ink);
+  }
+  .work-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+  .work-title {
+    font-weight: 900;
+    font-size: clamp(34px, 4.4vw, 64px);
+    line-height: 1.15;
+    letter-spacing: .01em;
+  }
+  .work-year { font-family: var(--font-display); font-weight: 700; font-size: 17px; white-space: nowrap; }
+  .work-sub { margin-top: 6px; font-weight: 700; color: var(--blue); }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .tags li {
+    font-size: 14px; font-weight: 500; line-height: 1;
+    padding: 8px 14px;
+    border: 1.5px solid var(--ink); border-radius: 999px;
+  }
+  .work-desc { margin-top: 20px; max-width: 32em; }
+  .work-link {
+    display: inline-block; margin-top: 28px;
+    background: var(--blue); color: var(--white);
+    font-weight: 700; font-size: 16px; text-decoration: none;
+    padding: 12px 22px; border-radius: 999px;
+    border: 2px solid var(--blue);
+    transition: background-color .2s, color .2s;
+  }
+  .work-link:hover { background: var(--paper); color: var(--blue); }
+
+  .work-cover {
+    aspect-ratio: 16 / 10;
+    border: 2px solid var(--ink);
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--white);
+    display: grid; place-items: center;
+  }
+  .work-cover img { width: 100%; height: 100%; object-fit: cover; }
+  .placeholder-label { color: var(--muted); font-size: 15px; }
+
+  /* 尚待補充的內容 */
+  .todo { color: var(--blue); border-bottom: 2px dashed var(--blue); }
+
+  /* 關於 */
+  .about {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(24px, 4vw, 64px);
+    padding-top: clamp(28px, 4vw, 48px);
+    border-top: 2px solid var(--ink);
+    margin-top: clamp(24px, 4vw, 48px);
+  }
+  .about .section-title { margin-bottom: 0; }
+  .about-body { max-width: 34em; }
+  .about-body:first-child { font-size: clamp(22px, 2.2vw, 30px); font-weight: 700; line-height: 1.4; padding-top: .35em; }   /* 第一行「黃威皓，UI/UX 設計師。」放大，對齊左邊的大標 */
+  .about-body + .about-body { margin-top: 12px; }
+  .about-body:first-child + .about-body { margin-top: 16px; }
+  .about-facts { margin-top: 28px; display: grid; gap: 10px; max-width: 34em; }
+  .about-facts div { display: grid; grid-template-columns: 4em 1fr; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid rgba(17,17,17,.15); }
+  .about-facts dt { font-weight: 700; color: var(--blue); }
+  .about-facts .skills { margin-top: 0; }
+  .about-facts div:has(.skills) { align-items: start; padding-bottom: 14px; }
+  .about-facts div:has(.skills) dt { padding-top: 4px; }
+  .skills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+  .skills li { font-size: 14px; font-weight: 500; line-height: 1; padding: 8px 14px; border: 1.5px solid var(--ink); border-radius: 999px; }
+
+  /* ---------- 聯絡：回到群青 ---------- */
+  .contact {
+    position: relative; z-index: 2;
+    background: var(--blue);
+    color: var(--white);
+    padding: clamp(72px, 10vw, 140px) var(--gutter) 32px;
+  }
+  .contact-title {
+    font-weight: 900;
+    color: var(--yellow);
+    font-size: clamp(64px, 15vw, 240px);
+    line-height: 1;
+    letter-spacing: .02em;
+  }
+  .contact-mail {
+    display: inline-block; margin-top: 24px;
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(22px, 3vw, 40px);
+    text-decoration-thickness: 2px; text-underline-offset: 8px;
+  }
+  .contact-links { display: flex; gap: 24px; margin-top: 32px; font-weight: 500; }
+  .contact-links a { text-decoration-thickness: 1.5px; text-underline-offset: 6px; }
+  .copyright { margin-top: clamp(64px, 8vw, 120px); font-size: 14px; opacity: .75; }
+
+  /* ---------- 作品介紹：從底部拉出的文件夾，頂端是五個作品的索引標籤 ---------- */
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .work-cover { cursor: pointer; }
+  .work-cover img { transition: transform .5s cubic-bezier(.2,.8,.2,1); }
+  .work-cover:hover img { transform: scale(1.03); }
+
+  html.case-open, html.case-open body { overflow: hidden; }
+  .case-layer { position: fixed; inset: 0; z-index: 300000; }
+  .case-layer[hidden] { display: none; }
+  .case-layer.no-anim .folder, .case-layer.no-anim .case-backdrop { animation: none !important; }
+  .case-backdrop { position: absolute; inset: 0; background: rgba(17, 17, 17, .5); cursor: pointer; }
+
+  .folder {
+    --tab-h: 52px;
+    position: absolute; left: clamp(0px, 2vw, 32px); right: clamp(0px, 2vw, 32px); bottom: 0;
+    top: clamp(28px, 6svh, 64px);
+    display: flex; flex-direction: column;
+    transform: translateY(var(--drag, 0px));
+  }
+  .folder.is-dragging { transition: none; }
+  .folder.is-settling { transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+
+  /* 索引標籤：像文件夾一樣互相重疊。打開的那張在最前面、跟本體連成同一張紙，其他的越遠越深、越往後 */
+  .folder-tabs {
+    position: relative; z-index: 2;
+    display: flex; height: var(--tab-h); align-items: flex-end;
+    padding-right: 64px;   /* 標籤不會延伸到本體右上的圓角，避免缺角 */
+    overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
+    touch-action: pan-x;
+  }
+  .folder-tabs::-webkit-scrollbar { display: none; }
+  .folder-tab {
+    --c: #E2DACB;
+    flex: none; position: relative; z-index: var(--z, 1);
+    height: var(--tab-h);
+    padding: 0 clamp(10px, 1vw, 16px) 0 clamp(34px, 3vw, 44px);   /* 左邊留出被前一張標籤壓住的寬度 */
+    margin-right: -6px;
+    font: inherit; font-weight: 700; font-size: clamp(14px, 1.15vw, 17px); line-height: 1;
+    color: var(--ink); background: none; border: 0;
+    cursor: pointer;
+  }
+  /* 標籤的形狀：上方圓角、右側斜斜往下延伸，壓在下一張標籤上 */
+  .folder-tab::before {
+    content: ""; position: absolute; inset: 0 -22px 0 0; z-index: -1;
+    background: var(--c);
+    border-radius: 18px 18px 0 0;
+    transform: perspective(48px) rotateX(5deg);
+    transform-origin: bottom left;
+    transition: background-color .2s, filter .12s;
+    pointer-events: none;   /* 斜邊只是外觀，點擊範圍以標籤本身為準，交界處不會一直偏向上層那張 */
+  }
+  .folder-tab { -webkit-tap-highlight-color: transparent; }
+  .tab-label { display: block; transition: transform .12s; }
+  .folder-tab:not([aria-selected="true"]):hover::before { filter: brightness(1.06); }
+  /* 按下的瞬間：標籤變深、往下壓一點，看得出手指按到哪一張；手指滑開再放就不會切換 */
+  .folder-tab:not([aria-selected="true"]):active::before { filter: brightness(.78); }
+  .folder-tab:not([aria-selected="true"]):active .tab-label { transform: translateY(2px); }
+  .folder-tab[aria-selected="true"] { --c: var(--paper); }
+  .folder-tab[aria-selected="true"]:hover { --c: var(--paper); }
+  .folder-tab:first-child { padding-left: clamp(18px, 1.8vw, 26px); }
+  /* 手機：不讓標籤列左右捲動（會把前面的作品藏起來），改成五張全部擠進畫面。
+     打開的那張完整顯示，其他的平分剩下的空間，名字太長就截斷 */
+  @media (max-width: 760px) {
+    .folder-tabs { overflow: visible; padding-right: 16px; }
+    /* 斜邊寬度 --slant 跟著螢幕縮小；左邊留「斜邊＋5px」、右邊留 6px，兩側被鄰居壓住時字都不會被蓋到 */
+    .folder-tab { --slant: clamp(8px, 3vw, 14px); flex: 0 1 auto; min-width: 0; margin-right: -4px; padding: 0 6px 0 calc(var(--slant) + 5px); font-size: clamp(11px, 3.4vw, 14px); }
+    .tab-label { display: block; overflow: hidden; white-space: nowrap; text-overflow: clip; }
+    .folder-tab::before { right: calc(var(--slant) * -1); }
+    .folder-tab:first-child { padding-left: 12px; }
+  }
+  .folder-tab:focus-visible { outline: 3px solid var(--blue); outline-offset: -8px; border-radius: 14px; }
+
+  .folder-body {
+    position: relative; z-index: 1; flex: 1; min-height: 0;
+    overflow-y: auto; overscroll-behavior: contain;
+    background: var(--paper);
+    border-radius: 0 28px 0 0;
+  }
+  .folder { --case-pad: clamp(32px, 4vw, 56px); --title-size: clamp(40px, 5.2vw, 80px); }
+  .case-close {
+    position: absolute; z-index: 3;
+    /* 跟作品名稱第一行的中線對齊：標籤高度＋內容上方留白＋（標題行高 − 按鈕高度）÷ 2 */
+    top: calc(var(--tab-h) + var(--case-pad) + (var(--title-size) * 1.1 - 44px) / 2);
+    right: clamp(16px, 4vw, 56px);
+    width: 44px; height: 44px; border-radius: 50%;
+    font: inherit; font-size: 26px; line-height: 1; font-weight: 500;
+    color: var(--ink); background: var(--yellow);
+    border: 2px solid var(--ink); box-shadow: 0 4px 0 var(--ink);
+    cursor: pointer; transition: transform .08s ease-out, box-shadow .08s ease-out;
+  }
+  .case-close:active { transform: translateY(4px); box-shadow: 0 0 0 var(--ink); }
+  .case-layer :focus-visible { outline-color: var(--blue); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .case-layer.is-entering .case-backdrop { animation: fadeIn .35s ease-out; }
+    .case-layer.is-entering .folder { animation: folderIn .5s cubic-bezier(.2,.9,.25,1); }
+    .case-layer.is-leaving .case-backdrop { animation: fadeIn .3s ease-in reverse forwards; }
+    .case-layer.is-leaving .folder { animation: folderIn .3s ease-in reverse forwards; }
+    .case.is-switching { animation: caseSwap .3s ease-out; }
+    .case.from-right { animation: fromRight .32s cubic-bezier(.2,.8,.2,1); }
+    .case.from-left { animation: fromLeft .32s cubic-bezier(.2,.8,.2,1); }
+    @keyframes fromRight { from { transform: translateX(40%); opacity: 0; } to { transform: none; opacity: 1; } }
+    @keyframes fromLeft { from { transform: translateX(-40%); opacity: 0; } to { transform: none; opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes folderIn { from { transform: translateY(105%); } to { transform: translateY(0); } }
+    @keyframes caseSwap { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  }
+
+  /* 內容：固定欄位＋一段描述，下面全部是圖片 */
+  .case { padding: var(--case-pad) clamp(16px, 4vw, 56px) clamp(64px, 8vw, 110px); }
+  .case[hidden] { display: none; }
+  .folder-body { touch-action: pan-y; }   /* 直向照常捲動，橫向交給左右滑動切換作品 */
+  .case.is-swiping { transition: none; }
+  .case.is-snapping { transition: transform .25s cubic-bezier(.2,.8,.2,1), opacity .25s; }
+  /* 手機第一次打開時，底部浮出一顆小提示，幾秒後自己淡出，不佔版面 */
+  .swipe-hint {
+    position: absolute; z-index: 3; left: 50%; bottom: 24px;
+    margin: 0; padding: 10px 18px; border-radius: 999px;
+    font-size: 14px; font-weight: 700; white-space: nowrap;
+    color: var(--white); background: rgba(17, 17, 17, .85);
+    pointer-events: none;
+    opacity: 0; transform: translate(-50%, 12px);
+    transition: opacity .35s, transform .35s;
+  }
+  .swipe-hint.is-shown { opacity: 1; transform: translate(-50%, 0); }
+  .case-head {
+    display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(20px, 4vw, 64px); align-items: start;
+    padding-bottom: clamp(28px, 4vw, 48px);
+  }
+  .case-title { font-weight: 900; font-size: var(--title-size); line-height: 1.1; outline: none; padding-right: 60px; }
+  .case-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+  .case-ext {
+    font-weight: 700; font-size: 15px; text-decoration: none;
+    padding: 9px 16px; border-radius: 999px; border: 2px solid var(--ink); background: var(--white);
+  }
+  .case-ext::after { content: " ↗"; }
+  .case-ext:hover { background: var(--ink); color: var(--white); }
+  .case-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; padding-top: 6px; }
+  .case-meta div { padding: 10px 0; border-top: 1px solid rgba(17,17,17,.18); }
+  .case-meta dt { font-size: 13px; font-weight: 700; color: var(--blue); }
+  .case-meta dd { margin-top: 2px; font-weight: 500; }
+  .case-desc { margin-top: 20px; max-width: 34em; }
+
+  /* 圖片像 Behance 一樣無縫往下接：沒有間距、沒有外框 */
+  .case-gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-radius: 14px; overflow: hidden; }
+  .g-item { grid-column: 1 / -1; margin: 0; background: var(--white); }
+  .g-item.g-half { grid-column: auto; }
+  .g-item img { display: block; width: 100%; height: auto; }
+  .g-half img { height: 100%; object-fit: cover; }
+  .g-hero img { aspect-ratio: 16 / 10; object-fit: cover; }
+  .g-slot {
+    aspect-ratio: 16 / 9; display: grid; place-items: center; padding: 16px; text-align: center;
+    background: #ECE6DA; color: var(--blue); font-weight: 700;
+    outline: 2px dashed rgba(43, 59, 255, .5); outline-offset: -14px;
+  }
+  .g-slot:nth-child(even) { background: #E4DDCF; }
+
+  @media (max-width: 760px) {
+    .folder { --tab-h: 46px; left: 0; right: 0; }
+    .folder-body { border-radius: 0; }   /* 手機上文件夾貼齊螢幕邊緣，右上角不做圓角，最右邊的標籤才不會跟圓角之間留下缺口 */
+    .case-gallery { border-radius: 10px; }
+    .case-head { grid-template-columns: 1fr; }
+    .folder { --title-size: 38px; }
+    .case-meta { grid-template-columns: 1fr 1fr; }
+    .case-gallery { grid-template-columns: 1fr; }
+    .g-item.g-half { grid-column: 1 / -1; }
+  }
+
+  /* ---------- 手機 ---------- */
+  @media (max-width: 760px) {
+    body { font-size: 16px; }
+    .site-nav a, .brand { font-size: 14px; }
+    .hero { padding-top: 88px; }
+    /* 手機改成三行：WEI／HAO／HUANG */
+    .hero-name { font-size: 28vw; font-stretch: 100%; }
+    .hero-name .line:first-child .word { display: block; }
+    .sticker { left: var(--mx); top: var(--my); font-size: 13px; }
+    .st-circle { font-size: 14px; }
+    .st-star { font-size: 12px; }
+    .st-avatar-cut, .st-hobby { font-size: 12px; }
+    .st-logo, .st-pill-logo, .st-canva, .st-neon { font-size: 12px; }
+    .st-neon-job { font-size: 11px; }
+    .st-neon-tag { font-size: 16px; }
+    .st-pill-logo-wide svg { height: 1.25em; }
+    .work, .about { grid-template-columns: 1fr; }
+    .work-cover { order: -1; border-radius: 16px; }
+    .work { gap: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <a class="brand" href="#top">WEI HAO HUANG</a>
+  <nav class="site-nav" aria-label="主選單">
+    <a href="#works">作品</a>
+    <a href="#about">關於</a>
+    <a href="#contact">聯絡</a>
+  </nav>
+</header>
+
+<section class="hero" id="top">
+  <div class="hero-intro">
+    <p class="hero-role"><span class="latin" lang="nan-Latn">Lí-hó</span>！我是威皓。</p>
+    <p class="hero-lede">我是一名 UI/UX 設計師，喜歡把想法做成摸得到的東西：一個介面、一個網頁，或一盒桌遊。</p>
+    <button class="reset" type="button">重來一次</button>
+  </div>
+  <h1 class="hero-name is-intro" aria-label="Wei Hao Huang">
+    <span class="line" aria-hidden="true"><span class="word"><span class="ch" data-drag>W</span><span class="ch" data-drag>E</span><span class="ch" data-drag>I</span></span> <span class="word"><span class="ch" data-drag>H</span><span class="ch" data-drag>A</span><span class="ch" data-drag>O</span></span></span>
+    <span class="line" aria-hidden="true"><span class="word"><span class="ch" data-drag>H</span><span class="ch" data-drag>U</span><span class="ch" data-drag>A</span><span class="ch" data-drag>N</span><span class="ch" data-drag>G</span></span></span>
+  </h1>
+
+  <!-- 貼紙：之後可換成自己畫的圖，或官方工具標誌（見 .st-img 說明） -->
+  <div class="sticker st-neon st-neon-tag sticker-latin" data-drag role="img" aria-label="貼紙：Lí-hó!（台語的你好）" style="--lx:22%;--ty:43%;--mx:69%;--my:47%;--r:-5deg"><span>Lí-hó!</span></div>
+
+  <div class="sticker st-canva" data-drag data-shape="circle" role="img" aria-label="貼紙：Canva" style="--lx:10%;--ty:75%;--mx:77%;--my:58%;--r:12deg">
+    <svg aria-hidden="true" viewBox="0 0 508 508" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"><g transform="matrix(.26718 0 0 .26718 0 0)"><circle cx="950" cy="950" r="950" fill="#7d2ae7"/><circle cx="950" cy="950" r="950" fill="url(#prefix___Radial1)"/><circle cx="950" cy="950" r="950" fill="url(#prefix___Radial2)"/><circle cx="950" cy="950" r="950" fill="url(#prefix___Radial3)"/><circle cx="950" cy="950" r="950" fill="url(#prefix___Radial4)"/></g><path d="M446.744 276.845c-.665 0-1.271.43-1.584 1.33-4.011 11.446-9.43 18.254-13.891 18.254-2.563 0-3.6-2.856-3.6-7.336 0-11.21 6.71-34.982 10.095-45.82.392-1.312.646-2.485.646-3.483 0-3.15-1.722-4.696-5.987-4.696-4.598 0-9.547 1.8-14.36 10.233-1.663-7.435-6.691-10.683-13.715-10.683-8.12 0-15.965 5.224-22.421 13.696-6.456 8.471-14.048 11.25-19.76 9.88 4.108-10.057 5.634-17.57 5.634-23.145 0-8.746-4.324-14.028-11.308-14.028-10.624 0-16.747 10.134-16.747 20.797 0 8.237 3.736 16.708 11.954 20.817-6.887 15.573-16.943 29.66-20.758 29.66-4.93 0-6.379-24.123-6.105-41.38.176-9.9.998-10.408.998-13.401 0-1.722-1.115-2.896-5.595-2.896-10.448 0-13.676 8.844-14.165 18.998a50.052 50.052 0 01-1.8 11.406c-4.363 15.573-13.363 27.39-19.232 27.39-2.72 0-3.463-2.72-3.463-6.28 0-11.21 6.28-25.219 6.28-37.173 0-8.784-3.854-14.34-11.112-14.34-8.55 0-19.858 10.173-30.56 29.229 3.521-14.595 4.97-28.721-5.459-28.721a14.115 14.115 0 00-6.476 1.683 3.689 3.689 0 00-2.113 3.56c.998 15.535-12.521 55.329-25.336 55.329-2.328 0-3.463-2.524-3.463-6.593 0-11.23 6.691-34.943 10.056-45.801.43-1.409.666-2.622.666-3.678 0-2.974-1.84-4.5-6.007-4.5-4.578 0-9.547 1.741-14.34 10.174-1.683-7.435-6.711-10.683-13.735-10.683-11.523 0-24.397 12.19-30.051 28.076-7.572 21.208-22.832 41.692-43.375 41.692-18.645 0-28.486-15.515-28.486-40.03 0-35.392 25.982-64.308 45.253-64.308 9.215 0 13.617 5.869 13.617 14.869 0 10.897-6.085 15.964-6.085 20.112 0 1.272 1.057 2.524 3.15 2.524 8.374 0 18.234-9.841 18.234-23.262 0-13.422-10.897-23.243-30.168-23.243-31.851 0-63.898 32.047-63.898 73.113 0 32.673 16.121 52.374 44 52.374 19.017 0 35.628-14.79 44.588-32.047 1.018 14.302 7.513 21.776 17.413 21.776 8.804 0 15.925-5.243 21.364-14.458 2.094 9.645 7.65 14.36 14.87 14.36 8.275 0 15.201-5.243 21.794-14.986-.097 7.65 1.644 14.85 8.276 14.85 3.13 0 6.867-.725 7.533-3.464 6.984-28.877 24.24-52.453 29.523-52.453 1.565 0 1.995 1.507 1.995 3.287 0 7.846-5.537 23.928-5.537 34.2 0 11.092 4.716 18.43 14.459 18.43 10.8 0 21.775-13.227 29.092-32.556 2.29 18.058 7.24 32.633 14.987 32.633 9.508 0 26.392-20.014 36.625-41.203 4.01.509 10.036.372 15.827-3.717-2.465 6.241-3.912 13.07-3.912 19.897 0 19.663 9.39 25.18 17.47 25.18 8.785 0 15.907-5.243 21.365-14.458 1.8 8.315 6.398 14.34 14.85 14.34 13.225 0 24.71-13.519 24.71-24.612 0-2.934-1.252-4.715-2.72-4.715zm-274.51 18.547c-5.342 0-7.435-5.38-7.435-13.401 0-13.93 9.528-37.193 19.604-37.193 4.402 0 6.065 5.185 6.065 11.524 0 14.145-9.059 39.07-18.235 39.07zm182.948-41.574c-3.189-3.796-4.343-8.961-4.343-13.559 0-5.673 2.074-10.467 4.558-10.467 2.485 0 3.248 2.446 3.248 5.85 0 5.693-2.035 14.008-3.463 18.176zm41.418 41.574c-5.34 0-7.434-6.182-7.434-13.401 0-13.441 9.528-37.193 19.682-37.193 4.402 0 5.967 5.146 5.967 11.524 0 14.145-8.902 39.07-18.215 39.07z" fill="#fff" fill-rule="nonzero"/><defs><radialGradient id="prefix___Radial1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="scale(1469.491) rotate(-49.416 1.37 .302)"><stop offset="0" stop-color="#6420ff"/><stop offset="1" stop-color="#6420ff" stop-opacity="0"/></radialGradient><radialGradient id="prefix___Radial2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="rotate(54.703 42.717 594.194) scale(1657.122)"><stop offset="0" stop-color="#00c4cc"/><stop offset="1" stop-color="#00c4cc" stop-opacity="0"/></radialGradient><radialGradient id="prefix___Radial3" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1023 -1030 473.711 470.491 367 1684)"><stop offset="0" stop-color="#6420ff"/><stop offset="1" stop-color="#6420ff" stop-opacity="0"/></radialGradient><radialGradient id="prefix___Radial4" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(595.999 1372 -2298.41 998.431 777 256)"><stop offset="0" stop-color="#00c4cc" stop-opacity=".73"/><stop offset="0" stop-color="#00c4cc"/><stop offset="1" stop-color="#00c4cc" stop-opacity="0"/></radialGradient></defs></svg>
+  </div>
+  <div class="sticker st-logo st-logo-github" data-drag data-shape="circle" role="img" aria-label="貼紙：GitHub" style="--lx:38%;--ty:58%;--mx:59%;--my:58%;--r:-10deg">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c6.63 0 12 5.276 12 11.79-.001 5.067-3.29 9.567-8.175 11.187-.6.118-.825-.25-.825-.56 0-.398.015-1.665.015-3.242 0-1.105-.375-1.813-.81-2.181 2.67-.295 5.475-1.297 5.475-5.822 0-1.297-.465-2.344-1.23-3.169.12-.295.54-1.503-.12-3.125 0 0-1.005-.324-3.3 1.209a11.32 11.32 0 00-3-.398c-1.02 0-2.04.133-3 .398-2.295-1.518-3.3-1.209-3.3-1.209-.66 1.622-.24 2.83-.12 3.125-.765.825-1.23 1.887-1.23 3.169 0 4.51 2.79 5.527 5.46 5.822-.345.294-.66.81-.765 1.577-.69.31-2.415.81-3.495-.973-.225-.354-.9-1.223-1.845-1.209-1.005.015-.405.56.015.781.51.28 1.095 1.327 1.23 1.666.24.663 1.02 1.93 4.035 1.385 0 .988.015 1.916.015 2.196 0 .31-.225.664-.825.56C3.303 21.374-.003 16.867 0 11.791 0 5.276 5.37 0 12 0z" fill="#fff"/></svg>
+  </div>
+
+  <!-- 頭像與工具標誌（標誌為官方檔案） -->
+  <img class="sticker st-img st-avatar-cut" data-drag data-shape="circle" src="images/sticker-avatar.webp" alt="貼紙：威皓的頭像插畫" draggable="false" style="--lx:26%;--ty:50%;--mx:32%;--my:54%;--r:-6deg">
+  <div class="sticker st-logo st-logo-figma" data-drag role="img" aria-label="貼紙：Figma" style="--lx:30%;--ty:60%;--mx:10%;--my:35%;--r:8deg">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20a4 4 0 014-4h4v4a4 4 0 01-8 0z" fill="#24CB71"/><path d="M12 0v8h4a4 4 0 000-8h-4z" fill="#FF7237"/><path d="M15.967 16a4 4 0 100-8 4 4 0 000 8z" fill="#00B6FF"/><path d="M4 4a4 4 0 004 4h4V0H8a4 4 0 00-4 4z" fill="#FF3737"/><path d="M4 12a4 4 0 004 4h4V8H8a4 4 0 00-4 4z" fill="#874FFF"/></svg>
+  </div>
+  <div class="sticker st-pill-logo" data-drag role="img" aria-label="貼紙：Claude" style="--lx:1%;--ty:89%;--mx:5%;--my:44%;--r:-6deg">
+    <svg viewBox="0 0 104 24" aria-hidden="true"><path d="M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 01-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z" fill="#D97757"/><g transform="translate(26.4 2.4) scale(.8)"><path d="M13.623 20.222c-3.417 0-5.753-1.901-6.855-4.827a12.992 12.992 0 01-.838-4.772c0-4.907 2.206-8.315 7.08-8.315 3.275 0 5.297 1.425 6.448 4.826h1.402l-.19-4.69C18.709 1.18 16.258.543 13.276.543c-4.2 0-7.775 1.874-9.763 5.254a11.357 11.357 0 00-1.511 5.872c0 3.753 1.777 7.08 5.113 8.926a11.95 11.95 0 005.943 1.398c3.254 0 5.835-.617 8.122-1.697l.593-5.172h-1.43c-.858 2.362-1.88 3.78-3.574 4.534-.831.373-1.88.564-3.146.564zm14.74-17.914L28.499 0h-.967L23.23 1.29v.699l1.907.882v16.142c0 1.1-.565 1.344-2.043 1.528v1.18h7.319v-1.18c-1.484-.184-2.042-.428-2.042-1.528V2.315l-.007-.007zm29.104 19.685h.565l4.95-.937v-1.208l-.695-.054c-1.157-.109-1.457-.346-1.457-1.29V9.897l.137-2.763h-.783l-4.678.672v1.181l.457.082c1.266.183 1.64.536 1.64 1.419v7.67c-1.212.937-2.369 1.527-3.744 1.527-1.525 0-2.471-.774-2.471-2.58V9.905l.136-2.763h-.804l-4.684.672v1.181l.484.082c1.266.183 1.64.536 1.64 1.418v7.08c0 3 1.703 4.426 4.412 4.426 2.07 0 3.765-1.1 5.038-2.627L57.474 22l-.007-.007zm-13.602-9.55c0-3.836-2.043-5.309-5.733-5.309-3.254 0-5.616 1.344-5.616 3.57 0 .666.238 1.175.721 1.528l2.478-.326c-.109-.746-.163-1.201-.163-1.391 0-1.263.674-1.901 2.042-1.901 2.022 0 3.044 1.419 3.044 3.7v.746l-5.106 1.527c-1.702.462-2.67.863-3.316 1.8a3.386 3.386 0 00-.476 1.9c0 2.172 1.497 3.706 4.057 3.706 1.852 0 3.493-.835 4.922-2.416.51 1.581 1.294 2.416 2.69 2.416 1.13 0 2.15-.455 3.063-1.344l-.272-.937a4.363 4.363 0 01-1.178.163c-.783 0-1.157-.617-1.157-1.826v-5.607zm-6.536 7.378c-1.396 0-2.26-.808-2.26-2.226 0-.964.456-1.528 1.43-1.854l4.139-1.31v3.965c-1.321.997-2.097 1.425-3.31 1.425zm43.095 1.235v-1.208l-.701-.054c-1.158-.109-1.45-.346-1.45-1.29V2.308L78.409 0h-.974l-4.302 1.29v.699l1.906.882V8.18a6.024 6.024 0 00-3.656-1.046c-4.276 0-7.612 3.245-7.612 8.098 0 3.998 2.397 6.761 6.346 6.761 2.042 0 3.819-.99 4.922-2.525l-.136 2.525h.571l4.95-.937zm-8.96-12.313c2.043 0 3.575 1.181 3.575 3.353v6.11a4.91 4.91 0 01-3.547 1.425c-2.928 0-4.412-2.308-4.412-5.39 0-3.462 1.695-5.498 4.385-5.498zm19.424 3.055c-.381-1.792-1.484-2.81-3.016-2.81-2.288 0-3.874 1.717-3.874 4.18 0 3.646 1.934 6.008 5.059 6.008a5.858 5.858 0 005.03-2.953l.913.245c-.408 3.163-3.281 5.525-6.808 5.525-4.14 0-6.992-3.054-6.992-7.399 0-4.378 3.098-7.46 7.237-7.46 3.09 0 5.27 1.853 5.97 5.07l-10.783 3.3V14.05l7.264-2.247v-.006z" fill="#191919"/></g></svg>
+  </div>
+
+  <!-- 畢業製作《台灣海怪》：妖怪插畫，做成螢光貼紙 -->
+  <div class="sticker st-neon st-neon-monster" data-drag data-first role="img" aria-label="貼紙：坐桶仔桌遊裡的海上妖怪" style="--lx:18%;--ty:51%;--mx:5%;--my:53%;--r:-4deg"><img src="images/sticker-monster.webp" alt="" draggable="false"></div>
+  <div class="sticker st-pill-logo st-pill-logo-wide" data-drag role="img" aria-label="貼紙：Magnific" style="--lx:34%;--ty:45%;--mx:38%;--my:45%;--r:5deg">
+    <svg viewBox="0 0 3278.21 538.45" aria-hidden="true"><path d="M1650,119.53l-9.93,34.47c-10.08-11.16-22.07-20.35-36.02-27.56-19.74-10.16-42.82-15.26-69.15-15.26-29.85,0-56.35,6.72-79.61,20.15-23.23,13.44-41.27,31.83-54.03,55.17-12.79,23.37-19.17,49.39-19.17,78.06s6.47,54.09,19.47,77.26c12.97,23.17,31.1,41.39,54.33,54.63,23.26,13.24,49.59,19.87,79.02,19.87,23.62,0,44.16-3.87,61.6-11.64,4.35-1.94,8.53-4.07,12.55-6.35,19.95-11.33,36.05-25.99,46.69-38.23l13.81,47.94,68.79-.03-31.43-109.26V119.53h-56.92ZM1630.29,312.79c-.27.48-.57.94-.83,1.39-8.08,13.72-19.14,24.4-33.25,32.05-14.52,7.88-30.89,11.81-49.11,11.81s-35.66-3.93-49.97-11.81c-14.34-7.89-25.58-18.96-33.69-33.28-8.14-14.29-12.2-30.43-12.2-48.39s4.05-34.73,12.2-49.22c8.14-14.46,19.38-25.85,33.69-34.1,14.31-8.25,30.98-12.38,49.97-12.38s34.59,4.04,49.11,12.1c14.52,8.06,25.85,19.41,33.99,34.1,8.14,14.69,12.2,31.17,12.2,49.5s-4.02,33.96-12.11,48.2v.03ZM2476.48,68.86h72.07V0h-72.07v68.86ZM2479.37,407.99h66.82V119.53h-66.82v288.48-.03ZM3186.53,342.26c-15.11,10.16-32.17,15.26-51.15,15.26-28.3,0-50.83-8.34-67.7-25.02-16.84-16.68-25.27-39.51-25.27-68.46,0-19.41,3.86-36.21,11.62-50.3,7.76-14.12,18.6-25.02,32.54-32.74,13.94-7.69,30.2-11.56,48.8-11.56,35.23,0,65.75,12.72,84.17,53.23l58.66-22.4c-10.05-30.06-31.29-51.64-56.82-66.61-25.59-14.97-54.24-22.46-86.01-22.46s-58.79,6.55-83.39,19.59c-24.6,13.07-43.87,31.17-57.81,54.34-13.97,23.17-20.95,49.47-20.95,78.91s6.77,56.28,20.34,79.45c13.57,23.17,32.62,41.11,57.25,53.8,24.6,12.69,52.77,19.04,84.57,19.04s59.99-7.74,85.13-22.46c25.53-14.97,46.24-36.95,56.72-66.3l-58.18-22.23c-7.7,15-17.4,26.73-32.52,36.92ZM2017.85,152.04c-60.68-67.69-190.89-47.4-231.26,31.06-71.36,132.46,66.37,275.56,206.28,198.81,0,0,11.06-6.69,24.99-18.33v33.51c7.57,100.46-163.64,114.49-191.16,20.35l-58.68,22.4c11.63,26.99,44.25,98.61,154.57,98.61,145.39,0,162.12-95.71,162.12-138.21V119.53h-57.49l-9.36,32.51ZM2008.55,302.43c-66.4,95.93-216.39,16.4-159.79-90.5,22.24-42.81,86.05-54.46,127.83-32.02,43.26,22.23,55.37,82.67,31.96,122.49v.03ZM2370.36,125.54c-16.85-9.56-37.48-14.35-61.87-14.35-18.99,0-34.77,2.51-47.35,7.49-10.55,4.18-19.8,9.88-27.76,17.05,0,0-10.44,8.94-20.75,20.64l-10.62-36.84h-56.24v288.48h66.82v-153.15c0-17.62,2.98-32.77,9.01-45.43,5.99-12.67,14.82-22.4,26.45-29.21,11.63-6.8,25.38-10.19,41.27-10.19,22.07,0,38.44,6.15,49.11,18.45,10.64,12.3,15.98,31.31,15.98,57.02v162.52h66.82v-175.44c0-25.36-4.26-47.17-12.79-65.36-8.53-18.19-21.2-32.08-38.08-41.65v-.03ZM2848.5,68.86h72.04V0h-72.04v68.86ZM2715.13,74.33c0-16,12.66-19.93,20.87-19.93h56.42L2808.04.03h-85.18c-41.18,0-74.55,31.85-74.55,71.17v48.34h-54.63v54.37h54.63v234.11h66.82v-234.11h136.3v234.11h66.82V119.53h-203.12v-45.21ZM353.68,0l-58.95,140.68L235.81,0h-117.9L.01,407.99c-1.58,0,147.36,0,147.36,0l147.36-182.9,147.36,182.9s148.94,0,147.36,0L471.58,0h-117.9ZM1222.86,0l-112.62,247.86L996.42,0h-112.26v407.99h67.98V67.1l158.06,343,156.9-343v340.92h67.98V0h-112.26.03Z" fill="#101010"/></svg>
+  </div>
+  <!-- 求職中：螢光橘 -->
+  <div class="sticker st-neon st-neon-job" data-drag role="img" aria-label="貼紙：求職中，Open to work" style="--lx:3%;--ty:46%;--mx:46%;--my:35%;--r:-7deg"><b>求職中</b><small>Open to work</small></div>
+</section>
+
+<main class="sheet">
+  <section id="works" aria-labelledby="worksTitle">
+    <h2 class="section-title" id="worksTitle">作品：</h2>
+
+    <article class="work">
+      <div class="work-meta">
+        <div class="work-head">
+          <h3 class="work-title">台灣好樂園</h3>
+          <span class="work-year">2026</span>
+        </div>
+        <p class="work-sub">主題樂園資訊平台改版</p>
+        <ul class="tags"><li>UI/UX</li><li>網站改版</li><li>設計系統</li></ul>
+        <p class="work-desc">以「依目的找樂園」為出發點，重新梳理主題樂園平台的資訊架構。以全台樂園地圖串起樂園、活動與遊玩資訊，並延續觀光署的品牌形象，建立一套能跨裝置沿用的設計系統。</p>
+        <a class="work-link" href="#park">看作品</a>
+      </div>
+      <figure class="work-cover"><img src="images/park-cover.webp" alt="手托著筆電，畫面是台灣好樂園的最新消息頁" loading="lazy"></figure>
+    </article>
+
+    <article class="work">
+      <div class="work-meta">
+        <div class="work-head">
+          <h3 class="work-title">全國賽會</h3>
+          <span class="work-year">2026</span>
+        </div>
+        <p class="work-sub">賽事搜尋與比較</p>
+        <ul class="tags"><li>UI/UX</li><li>互動設計</li></ul>
+        <p class="work-desc">「跑者廣場」的全國賽會專區收錄全台路跑、超馬、越野與鐵人賽事，原本卻只是一張長長的表格。改版後以賽事卡片搭配篩選與並排比較，讓跑者不用來回翻找，就能挑出最適合自己的那一場。</p>
+        <a class="work-link" href="#race">看作品</a>
+      </div>
+      <figure class="work-cover"><img src="images/race-cover.webp" alt="手拿手機，畫面是全國賽會的賽事比較結果" loading="lazy"></figure>
+    </article>
+
+    <article class="work">
+      <div class="work-meta">
+        <div class="work-head">
+          <h3 class="work-title">恆鐏鋼鐵</h3>
+          <span class="work-year">2025</span>
+        </div>
+        <p class="work-sub">鋼鐵訂製品牌形象網站</p>
+        <ul class="tags"><li>UI 設計</li><li>形象網站</li><li>接案</li></ul>
+        <p class="work-desc">為鋼鐵訂製品牌打造的形象網站。以深色基調與飛濺的火花帶出「質感工業，專屬打造」的品牌個性，搭配清楚的服務介紹，讓工藝感與專業度一眼可見。</p>
+        <a class="work-link" href="#steel">看作品</a>
+      </div>
+      <figure class="work-cover"><img src="images/steel-cover.webp" alt="有人正在用筆電瀏覽恆鐏鋼鐵的形象網站" loading="lazy"></figure>
+    </article>
+
+    <article class="work">
+      <div class="work-meta">
+        <div class="work-head">
+          <h3 class="work-title">MYDAY</h3>
+          <span class="work-year">2024–2025</span>
+        </div>
+        <p class="work-sub">代購 App 兩階段改版</p>
+        <ul class="tags"><li>UI/UX</li><li>App 改版</li><li>使用者研究</li><li>設計系統</li></ul>
+        <p class="work-desc">一款代購 App 的兩階段改版。從使用者訪談出發，重新整理搜尋、比價到委託的流程，讓委託從五個步驟縮短為三步，再建立一套統一的字體、色彩與間距規範。</p>
+        <a class="work-link" href="#myday">看作品</a>
+      </div>
+      <figure class="work-cover"><img src="images/myday-cover.webp" alt="手拿著手機，畫面是 MYDAY 代購 App 的首頁" loading="lazy"></figure>
+    </article>
+
+    <article class="work">
+      <div class="work-meta">
+        <div class="work-head">
+          <h3 class="work-title">坐桶仔</h3>
+          <span class="work-year">2023</span>
+        </div>
+        <p class="work-sub">畢業製作｜台灣海怪桌遊（華語／台語版）</p>
+        <ul class="tags"><li>遊戲設計</li><li>平面設計</li><li>印刷</li></ul>
+        <p class="work-desc">以台灣海上妖怪傳說為題的卡牌桌遊，推出華語與台語兩個版本，讓孩子在遊戲的過程中，認識流傳在台灣海邊的在地故事。</p>
+        <a class="work-link" href="#game">看作品</a>
+      </div>
+      <figure class="work-cover"><img src="images/game-cover.webp" alt="桌遊《坐桶仔》的木紋盒子與海怪卡牌" loading="lazy"></figure>
+    </article>
+  </section>
+
+  <section class="about" id="about" aria-labelledby="aboutTitle">
+    <h2 class="section-title" id="aboutTitle">關於：</h2>
+    <div>
+      <p class="about-body">黃威皓，UI/UX 設計師。</p>
+      <p class="about-body">喜歡動手，把想法拆開、排好，再做出來。習慣從使用者的問題出發，先釐清脈絡與需求，再一步步把複雜的資訊整理成清楚、好用的介面。參與過網站與 App 改版、企業形象網站設計，也曾一個人完成一套從規劃到印刷的桌遊。</p>
+      <p class="about-body">熟悉 Figma 與 Adobe 系列工具，並善用 AI 把設計實作成能操作的網頁，持續探索設計從畫面走進真實使用的可能。</p>
+    </div>
+  </section>
+</main>
+
+<footer class="contact" id="contact">
+  <h2 class="contact-title">一起聊聊</h2>
+  <a class="contact-mail" href="mailto:weihaowilly0113@gmail.com">weihaowilly0113@gmail.com</a>
+  <ul class="contact-links">
+    <li><a href="https://www.behance.net/e80a02a0">Behance</a></li>
+  </ul>
+  <p class="copyright">© 2026 Wei Hao Huang</p>
+</footer>
+
+<div class="case-layer" id="caseLayer" hidden>
+  <div class="case-backdrop" data-close></div>
+  <div class="folder" role="dialog" aria-modal="true" aria-label="作品介紹">
+    <div class="folder-tabs" role="tablist" aria-label="作品"><button class="folder-tab" type="button" role="tab" id="tab-park" data-key="park" aria-controls="case-park" aria-selected="false" tabindex="-1"><span class="tab-label">台灣好樂園</span></button><button class="folder-tab" type="button" role="tab" id="tab-race" data-key="race" aria-controls="case-race" aria-selected="false" tabindex="-1"><span class="tab-label">全國賽會</span></button><button class="folder-tab" type="button" role="tab" id="tab-steel" data-key="steel" aria-controls="case-steel" aria-selected="false" tabindex="-1"><span class="tab-label">恆鐏鋼鐵</span></button><button class="folder-tab" type="button" role="tab" id="tab-myday" data-key="myday" aria-controls="case-myday" aria-selected="false" tabindex="-1"><span class="tab-label">MYDAY</span></button><button class="folder-tab" type="button" role="tab" id="tab-game" data-key="game" aria-controls="case-game" aria-selected="false" tabindex="-1"><span class="tab-label">坐桶仔</span></button></div>
+    <button class="case-close" type="button" aria-label="關閉作品介紹">×</button>
+    <p class="swipe-hint" aria-hidden="true">← 左右滑動切換作品 →</p>
+    <div class="folder-body">
+      <article class="case" id="case-park" data-key="park" role="tabpanel" aria-labelledby="case-park-title" hidden>
+      <header class="case-head">
+        <div><h2 class="case-title" id="case-park-title" tabindex="-1">台灣好樂園</h2><div class="case-links"><a class="case-ext" href="https://fcu-11504-themepark.dev-hub.io/index.html" target="_blank" rel="noopener">上線網站<span class="sr-only">（另開新視窗）</span></a><a class="case-ext" href="https://weihaowilly0113-a11y.github.io/park-brief/" target="_blank" rel="noopener">完整簡報<span class="sr-only">（另開新視窗）</span></a></div></div>
+        <div><dl class="case-meta"><div><dt>年份</dt><dd>2026</dd></div><div><dt>類型</dt><dd>網站改版</dd></div><div><dt>團隊</dt><dd>設計 2 人、前端 2 人</dd></div><div><dt>我負責</dt><dd>首頁以外的頁面設計、Wireframe、元件庫、JS 互動</dd></div></dl><p class="case-desc">以「依目的找樂園」為出發點，重新梳理主題樂園平台的資訊架構。以全台樂園地圖串起樂園、活動與遊玩資訊，並延續觀光署的品牌形象，建立一套能跨裝置沿用的設計系統。</p></div>
+      </header>
+      <div class="case-gallery"><figure class="g-item g-hero"></figure><figure class="g-item g-slot"><span>簡報頁：資訊架構重整</span></figure><figure class="g-item g-slot"><span>簡報頁：線框稿規劃</span></figure><figure class="g-item"><img src="images/park-devices.webp" alt="最新消息頁在筆電、平板、手機上的畫面" loading="lazy"></figure><figure class="g-item"><img src="images/park-monitor.webp" alt="樂玩日誌頁" loading="lazy"></figure><figure class="g-item g-half"><img src="images/park-float.webp" alt="手機與平板上的最新消息頁" loading="lazy"></figure><figure class="g-item g-slot g-half"><span>簡報頁：手機版的三個取捨</span></figure><figure class="g-item g-slot"><span>簡報頁：設計系統與元件庫</span></figure><figure class="g-item"><img src="images/park-laptop.webp" alt="筆電上的最新消息頁" loading="lazy"></figure></div>
+    </article><article class="case" id="case-race" data-key="race" role="tabpanel" aria-labelledby="case-race-title" hidden>
+      <header class="case-head">
+        <div><h2 class="case-title" id="case-race-title" tabindex="-1">全國賽會</h2><div class="case-links"><a class="case-ext" href="https://weihaowilly0113-a11y.github.io/race-brief/" target="_blank" rel="noopener">完整簡報<span class="sr-only">（另開新視窗）</span></a></div></div>
+        <div><dl class="case-meta"><div><dt>年份</dt><dd>2026</dd></div><div><dt>類型</dt><dd>網站改版</dd></div><div><dt>團隊</dt><dd>3 人</dd></div><div><dt>我負責</dt><dd>賽事卡片、電腦版與手機版的比較功能</dd></div></dl><p class="case-desc">「跑者廣場」的全國賽會專區收錄全台路跑、超馬、越野與鐵人賽事，原本卻只是一張長長的表格。改版後以賽事卡片搭配篩選與並排比較，讓跑者不用來回翻找，就能挑出最適合自己的那一場。</p></div>
+      </header>
+      <div class="case-gallery"><figure class="g-item g-hero"></figure><figure class="g-item g-slot"><span>簡報頁：原網站與問題</span></figure><figure class="g-item g-slot"><span>簡報頁：人物誌</span></figure><figure class="g-item g-slot"><span>簡報頁：賽事卡片的狀態</span></figure><figure class="g-item"><img src="images/race-laptop.webp" alt="筆電上的賽事比較視窗" loading="lazy"></figure><figure class="g-item"><img src="images/race-phone.webp" alt="手機上的賽事比較結果" loading="lazy"></figure><figure class="g-item g-slot"><span>簡報頁：手機版 V1→V4 迭代</span></figure></div>
+    </article><article class="case" id="case-steel" data-key="steel" role="tabpanel" aria-labelledby="case-steel-title" hidden>
+      <header class="case-head">
+        <div><h2 class="case-title" id="case-steel-title" tabindex="-1">恆鐏鋼鐵</h2><div class="case-links"><a class="case-ext" href="https://www.behance.net/e80a02a0" target="_blank" rel="noopener">Behance<span class="sr-only">（另開新視窗）</span></a></div></div>
+        <div><dl class="case-meta"><div><dt>年份</dt><dd>2025</dd></div><div><dt>類型</dt><dd>接案・企業形象網站</dd></div><div><dt>我負責</dt><dd>網站 UI 設計</dd></div></dl><p class="case-desc">為鋼鐵訂製品牌打造的形象網站。以深色基調與飛濺的火花帶出「質感工業，專屬打造」的品牌個性，搭配清楚的服務介紹，讓工藝感與專業度一眼可見。</p></div>
+      </header>
+      <div class="case-gallery"><figure class="g-item g-hero"></figure><figure class="g-item g-slot"><span>簡報頁：首頁完整畫面</span></figure><figure class="g-item g-slot"><span>簡報頁：服務介紹</span></figure><figure class="g-item g-slot g-half"><span>簡報頁：手機版</span></figure><figure class="g-item g-slot g-half"><span>簡報頁：其他頁面</span></figure></div>
+    </article><article class="case" id="case-myday" data-key="myday" role="tabpanel" aria-labelledby="case-myday-title" hidden>
+      <header class="case-head">
+        <div><h2 class="case-title" id="case-myday-title" tabindex="-1">MYDAY</h2><div class="case-links"><a class="case-ext" href="https://www.behance.net/e80a02a0" target="_blank" rel="noopener">Behance<span class="sr-only">（另開新視窗）</span></a></div></div>
+        <div><dl class="case-meta"><div><dt>年份</dt><dd>2024–2025</dd></div><div><dt>類型</dt><dd>個人專案・App 改版</dd></div><div><dt>我負責</dt><dd>研究、設計與測試，一人完成</dd></div></dl><p class="case-desc">一款代購 App 的兩階段改版。從使用者訪談出發，重新整理搜尋、比價到委託的流程，讓委託從五個步驟縮短為三步，再建立一套統一的字體、色彩與間距規範。</p></div>
+      </header>
+      <div class="case-gallery"><figure class="g-item g-hero"></figure><figure class="g-item g-slot"><span>簡報頁：訪談與人物誌</span></figure><figure class="g-item g-slot"><span>簡報頁：委託流程：五步到三步</span></figure><figure class="g-item g-slot g-half"><span>簡報頁：主要畫面</span></figure><figure class="g-item g-slot g-half"><span>簡報頁：主要畫面</span></figure><figure class="g-item g-slot"><span>簡報頁：設計系統</span></figure></div>
+    </article><article class="case" id="case-game" data-key="game" role="tabpanel" aria-labelledby="case-game-title" hidden>
+      <header class="case-head">
+        <div><h2 class="case-title" id="case-game-title" tabindex="-1">坐桶仔</h2><div class="case-links"><a class="case-ext" href="https://www.behance.net/e80a02a0" target="_blank" rel="noopener">Behance<span class="sr-only">（另開新視窗）</span></a></div></div>
+        <div><dl class="case-meta"><div><dt>年份</dt><dd>2023</dd></div><div><dt>類型</dt><dd>畢業製作・桌遊</dd></div><div><dt>版本</dt><dd>華語版、台語版</dd></div><div><dt>我負責</dt><dd>規劃、美術、包裝與印刷，一人完成</dd></div></dl><p class="case-desc">以台灣海上妖怪傳說為題的卡牌桌遊，推出華語與台語兩個版本，讓孩子在遊戲的過程中，認識流傳在台灣海邊的在地故事。</p></div>
+      </header>
+      <div class="case-gallery"><figure class="g-item g-hero"></figure><figure class="g-item"><img src="images/game-contents.webp" alt="坐桶仔的盒子、說明書、代幣與卡牌" loading="lazy"></figure><figure class="g-item g-half"><img src="images/game-tokens.webp" alt="木頭代幣與彩色妖怪卡牌" loading="lazy"></figure><figure class="g-item g-slot g-half"><span>簡報頁：妖怪卡牌設計</span></figure><figure class="g-item g-slot"><span>簡報頁：玩法說明</span></figure></div>
+    </article>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
+<script>
+  // 主視覺被蓋過之後，頁首換成米白底；回到聯絡區再換回群青
+  (function () {
+    var header = document.getElementById('siteHeader');
+    var sheet = document.querySelector('.sheet');
+    var ticking = false;
+    function update() {
+      var h = header.offsetHeight;
+      var r = sheet.getBoundingClientRect();
+      header.classList.toggle('is-paper', r.top <= h && r.bottom > h);
+      ticking = false;
+    }
+    window.addEventListener('scroll', function () {
+      if (!ticking) { requestAnimationFrame(update); ticking = true; }
+    }, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
+
+  // 字母與貼紙：有重力與碰撞的拖曳（Matter.js）；函式庫沒載入時退回單純拖曳
+  (function () {
+    var hero = document.querySelector('.hero');
+    var name = document.querySelector('.hero-name');
+    var items = Array.prototype.slice.call(document.querySelectorAll('[data-drag]'));
+    var resetBtn = document.querySelector('.reset');
+    var coarse = window.matchMedia('(pointer: coarse)');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var dropIn = !!window.Matter;   // 有物理引擎就讓貼紙掉落；減少動態時改成在背景算完，直接顯示堆好的樣子
+    var z = 10;
+
+    if (dropIn) hero.classList.add('stickers-waiting');
+
+    function canGrab(el, e) {
+      if (e.button !== 0) return false;
+      if (el.classList.contains('ch') && coarse.matches) return false;   // 手機上字母不給拖，避免擋住捲動
+      return true;
+    }
+    function lift(el) { el.classList.add('is-dragging'); el.style.zIndex = ++z; }
+    function drop(el) { el.classList.remove('is-dragging'); hero.classList.add('is-moved'); }
+
+    // 開場：字母先浮出，接著貼紙從上方掉下來
+    setTimeout(function () {
+      name.classList.remove('is-intro');
+      if (window.Matter) physics(); else simpleDrag();
+    }, 1300);
+
+    /* ---------- 物理版 ---------- */
+    function physics() {
+      var M = window.Matter;
+      var engine, objs = [], grab = null, raf = 0, lastWidth = 0, lastTime = 0, acc = 0;
+      // 桌機：字母一開始就是真的物體，疊在一起靠重力站著，碰到就會有反應
+      // 手機：字母固定不動（手指一碰就拖字會擋住捲動）
+      var liveLetters = !coarse.matches;
+      var lettersLive = false, rainAt = 0;   // 開場貼紙掉落時字母先固定，名字才不會一開始就被撞歪
+      var STEP = 1000 / 60;      // 固定步長：不論螢幕更新率是 60 或 120Hz，速度都一樣
+      var MAX_SPEED = 40;        // 速度上限，避免甩太快直接穿過其他物件
+      var LETTER = { restitution: .5, friction: .5 };   // 字母比貼紙（.6）稍微沒那麼彈；摩擦大一點，疊著比較穩
+
+      function heroPoint(e) {
+        var hr = hero.getBoundingClientRect();
+        return { x: e.clientX - hr.left, y: e.clientY - hr.top };
+      }
+
+      // 把貼紙放到畫面上方，讓它們依序掉下來；每次落點會有一點隨機
+      function rain(width) {
+        var stickers = objs.filter(function (o) { return o && !o.isCh; });
+        stickers.sort(function () { return Math.random() - .5; });
+        // 標了 data-first 的大貼紙（海怪）先掉，才會平躺在字上，不會卡在縫裡立起來
+        stickers.sort(function (p, q) { return ('first' in q.el.dataset) - ('first' in p.el.dataset); });
+        stickers.forEach(function (o, k) {
+          var b = o.body, half = o.w / 2 + 8;
+          var x = o.x0 + (Math.random() - .5) * width * ('first' in o.el.dataset ? .03 : .14);   // 先掉的大貼紙落點更固定
+          x = Math.min(Math.max(x, half), width - half);
+          M.Body.setPosition(b, { x: x, y: -o.h - 40 - k * 120 - Math.random() * 60 });
+          M.Body.setAngle(b, o.a0 + (Math.random() - .5) * .4);
+          M.Body.setVelocity(b, { x: (Math.random() - .5) * 3, y: 0 });
+          M.Body.setAngularVelocity(b, (Math.random() - .5) * .03);
+          M.Sleeping.set(b, false);
+        });
+      }
+
+      // 任何一個字母醒來（被撞、被抓）就叫醒所有東西：原本靠在它上面的字母和貼紙才會跟著掉，不會懸空
+      function wakeAll() {
+        objs.forEach(function (o) { if (o && !o.body.isStatic) M.Sleeping.set(o.body, false); });
+      }
+      // 固定字母：引擎預設會把固定物體的彈性設成 0、摩擦設成 1（很黏、不彈），這裡改回跟會動時一樣
+      function pin(body) {
+        if (body.isStatic) return;   // 重複固定會把「無限重」存成原本的重量，所以已固定的不再處理
+        M.Body.setStatic(body, true);
+        body.restitution = LETTER.restitution;
+        body.friction = LETTER.friction;
+      }
+      // 貼紙停好之後（或使用者一碰畫面），字母變成真的物體：睡著疊在原位，被碰到才醒
+      function unpinLetters() {
+        if (!liveLetters || lettersLive) return;
+        lettersLive = true;
+        objs.forEach(function (o) {
+          if (!o || !o.isCh || !o.body.isStatic) return;
+          M.Body.setStatic(o.body, false);
+          M.Sleeping.set(o.body, true);
+        });
+      }
+
+      function build() {
+        engine = M.Engine.create({ enableSleeping: true, positionIterations: 10, velocityIterations: 8 });
+        engine.gravity.y = 1;
+        lastWidth = window.innerWidth;
+
+        hero.classList.add('is-measuring');           // 量測時先拿掉位移和旋轉
+        var hr = hero.getBoundingClientRect();
+        var maxR = hr.width, maxB = hr.height;
+        // 依畫面上的實際位置分行（桌機的 WEI、HAO 在結構上同一行，但畫面上是兩行）
+        var rowTops = [];
+        Array.prototype.forEach.call(name.querySelectorAll('.ch'), function (c) {
+          var t = c.getBoundingClientRect().top - hr.top;
+          if (!rowTops.some(function (x) { return Math.abs(x - t) < 2; })) rowTops.push(t);
+        });
+        rowTops.sort(function (p, q) { return p - q; });
+        objs = items.map(function (el) {
+          el.style.transform = '';
+          if (!el.offsetWidth) return null;             // 手機上隱藏的貼紙不加入物理世界
+          var r = el.getBoundingClientRect();
+          var cx = r.left - hr.left + r.width / 2;
+          var cy = r.top - hr.top + r.height / 2;
+          var w = el.offsetWidth, h = el.offsetHeight;
+          var isCh = el.classList.contains('ch');
+          var a0 = (parseFloat(getComputedStyle(el).getPropertyValue('--r')) || 0) * Math.PI / 180;
+          var body;
+          if (isCh) {
+            // 字母的碰撞框往下延伸到下一行（或地板），讓三行字剛好疊在一起，開場不會往下掉一下
+            var top = r.top - hr.top;
+            var below = rowTops.filter(function (t) { return t > top + 2; });
+            var bottom = below.length ? below[0] : hr.height;
+            h = Math.max(bottom - top - .5, r.height * .8);
+            cy = top + h / 2;
+            body = M.Bodies.rectangle(cx, cy, w * .94, h, {
+              restitution: LETTER.restitution, friction: LETTER.friction, frictionAir: .012, density: .0015,
+              chamfer: { radius: Math.min(w, h) * .08 }   // 稍微倒角，撞到邊角時比較順，不會卡住亂轉
+            });
+            M.Body.setInertia(body, body.inertia * 2);   // 字母比較穩，不會一撞就狂轉
+            pin(body);                                   // 開場先固定，貼紙停好後才鬆開（手機一直固定）
+            M.Events.on(body, 'sleepEnd', wakeAll);
+            maxR = Math.max(maxR, cx + w / 2);
+          } else {
+            // 貼紙：比較輕、比較彈
+            // 先掉的大貼紙比較重，後面掉下來的貼紙比較不會把它撞到立起來
+            var opts = { angle: a0, restitution: .6, friction: .3, frictionAir: .012, density: 'first' in el.dataset ? .003 : .001 };
+            if (el.dataset.shape === 'circle') {
+              body = M.Bodies.circle(cx, cy, Math.min(w, h) / 2 * .97, opts);
+            } else {
+              opts.chamfer = { radius: Math.min(w, h) * .22 };
+              body = M.Bodies.rectangle(cx, cy, w, h, opts);
+            }
+            // 不容易翻轉，落地時文字比較不會倒過來；長條形的貼紙和海怪更穩，避免側躺或直直立起來
+            M.Body.setInertia(body, body.inertia * ('first' in el.dataset ? 20 : Math.max(w, h) / Math.min(w, h) > 1.6 ? 12 : 4));
+          }
+          return { el: el, body: body, x0: cx, y0: cy, a0: a0, w: w, h: h, isCh: isCh, neon: el.classList.contains('st-neon') };
+        });
+        hero.classList.remove('is-measuring');
+        var live = objs.filter(Boolean);
+        maxR = Math.min(maxR, hr.width);   // 右牆貼著畫面右緣，貼紙才不會滑出畫面
+        maxB = hr.height;                  // 地板貼著畫面底部（字母最下面一行就站在地板上）
+
+        // 四周的牆；上方的牆放得很高，讓貼紙可以從畫面外掉進來
+        var t = 400;
+        var walls = [
+          M.Bodies.rectangle(maxR / 2, -3000 - t / 2, maxR + 2 * t, t, { isStatic: true }),
+          M.Bodies.rectangle(maxR / 2, maxB + t / 2, maxR + 2 * t, t, { isStatic: true }),
+          M.Bodies.rectangle(-t / 2, maxB / 2 - 1500, t, maxB + 3000 + 2 * t, { isStatic: true }),
+          M.Bodies.rectangle(maxR + t / 2, maxB / 2 - 1500, t, maxB + 3000 + 2 * t, { isStatic: true })
+        ];
+        M.Composite.add(engine.world, walls.concat(live.map(function (o) { return o.body; })));
+
+        lettersLive = false; rainAt = performance.now();
+        if (dropIn) rain(hr.width);
+        if (reduce) {
+          // 減少動態：不播放掉落動畫，先在背景把掉落模擬完（約 10 秒的份量），直接顯示停好的結果
+          for (var i = 0; i < 600; i++) M.Engine.update(engine, STEP);
+          unpinLetters();
+        }
+        live.forEach(function (o) { if (!o.isCh) render(o); });
+        hero.classList.remove('stickers-waiting');
+        lastTime = 0; acc = 0;
+        raf = requestAnimationFrame(loop);
+      }
+
+      function render(o) {
+        var b = o.body;
+        o.el.style.transform =
+          'translate(' + (b.position.x - o.x0) + 'px,' + (b.position.y - o.y0) + 'px) rotate(' + b.angle + 'rad)' +
+          (grab && grab.o === o ? ' scale(1.06)' : '');
+        if (o.neon) {
+          // 螢光貼紙的反光：貼紙轉動或左右移動時，反光跟著滑動，像真的在反射光線
+          var deg = Math.atan2(Math.sin(b.angle), Math.cos(b.angle)) * 180 / Math.PI;
+          var s = 35 + deg * 1.2 + (b.position.x - o.x0) * .06;
+          o.el.style.setProperty('--sheen', Math.max(-20, Math.min(120, s)).toFixed(1));
+        }
+      }
+
+      function loop(now) {
+        if (!lastTime) lastTime = now;
+        acc += Math.min(now - lastTime, 100);
+        lastTime = now;
+        var n = 0;
+        while (acc >= STEP && n < 4) { M.Engine.update(engine, STEP); acc -= STEP; n++; }
+        if (n === 4) acc = 0;
+        // 抓著的時候抑制旋轉，避免拿在手上一直轉
+        if (grab) M.Body.setAngularVelocity(grab.o.body, grab.o.body.angularVelocity * .8);
+        // 貼紙都停下來（或掉落開始超過 5 秒）就鬆開字母
+        if (liveLetters && !lettersLive && now - rainAt > 1500) {
+          var settled = objs.every(function (o) { return !o || o.isCh || o.body.isSleeping; });
+          if (settled || now - rainAt > 5000) unpinLetters();
+        }
+        objs.forEach(function (o) {
+          if (!o) return;
+          var b = o.body;
+          if (b.isStatic) return;
+          if (b.speed > MAX_SPEED && M.Body.setSpeed) M.Body.setSpeed(b, MAX_SPEED);
+          if (!b.isSleeping) render(o);
+        });
+        raf = requestAnimationFrame(loop);
+      }
+
+      function release() {
+        if (!grab) return;
+        M.Composite.remove(engine.world, grab.c);
+        // 甩的力道：用放手前最後一小段的滑鼠速度，讓物件照你甩的方向和速度飛出去
+        var tr = grab.trail, last = tr[tr.length - 1], now = performance.now();
+        var recent = tr.filter(function (s) { return now - s.t < 150; });
+        var first = recent.length > 1 ? recent[0] : tr[tr.length - 2];
+        if (first && last && last.t > first.t && now - last.t < 100) {   // 放手前停住超過 0.1 秒就不算甩
+          var k = STEP / (last.t - first.t) * 1.1;
+          var v = { x: (last.x - first.x) * k, y: (last.y - first.y) * k };
+          var sp = Math.sqrt(v.x * v.x + v.y * v.y);
+          if (sp > MAX_SPEED) { v.x *= MAX_SPEED / sp; v.y *= MAX_SPEED / sp; }
+          if (sp > grab.o.body.speed) M.Body.setVelocity(grab.o.body, v);
+        }
+        var el = grab.o.el;
+        grab = null;
+        drop(el);
+      }
+
+      items.forEach(function (el, i) {
+        el.addEventListener('pointerdown', function (e) {
+          if (!engine || !objs[i] || !canGrab(el, e)) return;
+          e.preventDefault();
+          el.setPointerCapture(e.pointerId);
+          unpinLetters();                                  // 一碰到就開始物理，不用等貼紙停好
+          var o = objs[i], b = o.body, p = heroPoint(e);
+          M.Sleeping.set(b, false);
+          // 從物件中心拉動、保留滑鼠和中心的距離：移動自然，但不會因為抓在邊角而被甩著轉
+          var offset = M.Vector.sub(p, b.position);
+          grab = {
+            o: o, offset: offset, trail: [{ x: p.x, y: p.y, t: performance.now() }],
+            c: M.Constraint.create({
+              pointA: M.Vector.sub(p, offset), bodyB: b, pointB: { x: 0, y: 0 },
+              length: 0, stiffness: .9, damping: .08   // 拉得比較緊，跟手、甩得出去
+            })
+          };
+          M.Composite.add(engine.world, grab.c);
+          lift(el);
+        });
+        el.addEventListener('pointermove', function (e) {
+          if (!grab || grab.o !== objs[i] || !el.hasPointerCapture(e.pointerId)) return;
+          var hp = heroPoint(e);
+          grab.c.pointA = M.Vector.sub(hp, grab.offset);
+          // 記錄最近的滑鼠軌跡，放手時用來算甩出去的速度
+          grab.trail.push({ x: hp.x, y: hp.y, t: performance.now() });
+          if (grab.trail.length > 6) grab.trail.shift();
+          M.Sleeping.set(grab.o.body, false);
+        });
+        el.addEventListener('pointerup', function () { if (grab && grab.o === objs[i]) release(); });
+        el.addEventListener('pointercancel', function () { if (grab && grab.o === objs[i]) release(); });
+      });
+
+      // 重來一次：字母滑回原位、先固定；貼紙再掉一次，停好後字母再鬆開
+      resetBtn.addEventListener('click', function () {
+        release();
+        hero.classList.add('is-resetting');
+        objs.forEach(function (o) {
+          if (!o || !o.isCh) return;
+          var b = o.body;
+          M.Body.setVelocity(b, { x: 0, y: 0 });
+          M.Body.setAngularVelocity(b, 0);
+          M.Body.setPosition(b, { x: o.x0, y: o.y0 });
+          M.Body.setAngle(b, 0);
+          pin(b);
+          o.el.style.transform = '';
+        });
+        lettersLive = false; rainAt = performance.now();
+        rain(hero.getBoundingClientRect().width);
+        if (reduce) {
+          for (var i = 0; i < 600; i++) M.Engine.update(engine, STEP);
+          unpinLetters();
+          objs.forEach(function (o) { if (o && !o.isCh) render(o); });
+        }
+        hero.classList.remove('is-moved');
+        setTimeout(function () { hero.classList.remove('is-resetting'); }, 650);
+      });
+
+      // 視窗寬度改變時重新建立（手機網址列伸縮只改高度，不重建）
+      var resizeTimer;
+      window.addEventListener('resize', function () {
+        if (window.innerWidth === lastWidth) return;
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+          cancelAnimationFrame(raf);
+          release();
+          M.Engine.clear(engine);
+          M.Composite.clear(engine.world, false);
+          hero.classList.remove('is-moved');
+          build();
+        }, 200);
+      });
+
+      build();
+    }
+
+    /* ---------- 備用：沒有物理效果的單純拖曳 ---------- */
+    function simpleDrag() {
+      items.forEach(function (el) {
+        var startX = 0, startY = 0, x = 0, y = 0;
+        el._reset = function () { x = 0; y = 0; };
+        el.addEventListener('pointerdown', function (e) {
+          if (!canGrab(el, e)) return;
+          e.preventDefault();
+          el.setPointerCapture(e.pointerId);
+          startX = e.clientX - x; startY = e.clientY - y;
+          lift(el);
+        });
+        el.addEventListener('pointermove', function (e) {
+          if (!el.hasPointerCapture(e.pointerId)) return;
+          x = e.clientX - startX; y = e.clientY - startY;
+          el.style.setProperty('--x', x + 'px');
+          el.style.setProperty('--y', y + 'px');
+        });
+        function end() { if (el.classList.contains('is-dragging')) drop(el); }
+        el.addEventListener('pointerup', end);
+        el.addEventListener('pointercancel', end);
+      });
+      resetBtn.addEventListener('click', function () {
+        hero.classList.add('is-resetting');
+        items.forEach(function (el) { el._reset(); el.style.removeProperty('--x'); el.style.removeProperty('--y'); });
+        hero.classList.remove('is-moved');
+        setTimeout(function () { hero.classList.remove('is-resetting'); }, 650);
+      });
+    }
+  })();
+  // 作品介紹：從底部拉出的文件夾。網址會變成 #park 這類，可以分享，也可以按返回鍵關閉
+  (function () {
+    var layer = document.getElementById('caseLayer');
+    var folder = layer.querySelector('.folder');
+    var body = layer.querySelector('.folder-body');
+    var tabs = Array.prototype.slice.call(layer.querySelectorAll('.folder-tab'));
+    var cases = Array.prototype.slice.call(layer.querySelectorAll('.case'));
+    var keys = cases.map(function (c) { return c.dataset.key; });
+    var works = Array.prototype.slice.call(document.querySelectorAll('.work'));
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var lastFocus = null, current = null;
+
+    // 首頁的封面圖直接借給文件夾的第一張圖，不重複放一份
+    works.forEach(function (w, i) {
+      var img = w.querySelector('.work-cover img');
+      var hero = layer.querySelector('#case-' + keys[i] + ' .g-hero');
+      if (img && hero) { var c = img.cloneNode(); c.loading = 'eager'; hero.appendChild(c); }
+    });
+
+    function setUrl(key, push) {   // 預覽視窗等環境可能不允許改網址；改不了也照樣打開
+      try {
+        if (push) history.pushState({ fromList: true }, '', '#' + key);
+        else history.replaceState({ fromList: history.state && history.state.fromList }, '', '#' + key);
+      } catch (err) {}
+    }
+    function siblings() {
+      return Array.prototype.filter.call(document.body.children, function (el) { return el !== layer && el.tagName !== 'SCRIPT'; });
+    }
+    function show(key, focusTab, dir) {
+      var c = layer.querySelector('#case-' + key);
+      var switching = current && current !== key;
+      cases.forEach(function (x) { x.hidden = x !== c; });
+      var ai = keys.indexOf(key), shades = ['#E2DACB', '#D2C9B7', '#C3B9A4', '#B4A991'];
+      tabs.forEach(function (t, i) {
+        var on = t.dataset.key === key, d = Math.abs(i - ai);
+        t.style.setProperty('--z', 10 - d);
+        if (on) t.style.removeProperty('--c'); else t.style.setProperty('--c', shades[Math.min(d - 1, shades.length - 1)]);
+        t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1;
+        if (on) t.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      });
+      current = key;
+      body.scrollTop = 0;
+      if (switching) {
+        var cls = dir > 0 ? 'from-right' : dir < 0 ? 'from-left' : 'is-switching';
+        c.classList.remove('is-switching', 'from-right', 'from-left'); void c.offsetWidth; c.classList.add(cls);
+      }
+      if (focusTab) layer.querySelector('#tab-' + key).focus();
+      document.title = c.querySelector('.case-title').textContent + '｜Wei Hao Huang';
+    }
+    function open(key) {
+      if (keys.indexOf(key) < 0) return close();
+      var wasOpen = !!current;
+      if (!wasOpen) lastFocus = document.activeElement;
+      show(key, false);
+      if (!wasOpen) {
+        layer.hidden = false;
+        layer.classList.remove('is-leaving');
+        layer.classList.add('is-entering');
+        setTimeout(function () { layer.classList.remove('is-entering'); }, 520);
+        document.documentElement.classList.add('case-open');
+        siblings().forEach(function (el) { el.inert = true; });
+        layer.querySelector('#case-' + key + ' .case-title').focus({ preventScroll: true });
+        if (typeof showHintOnce === 'function') showHintOnce();
+      }
+    }
+    function close() {
+      if (!current) return;
+      var key = current; current = null;
+      function done() {
+        layer.hidden = true;
+        layer.classList.remove('is-leaving', 'no-anim');
+        folder.style.removeProperty('--drag');
+        document.documentElement.classList.remove('case-open');
+        siblings().forEach(function (el) { el.inert = false; });
+        document.title = 'Wei Hao Huang｜UI/UX 設計師';
+        var btn = document.querySelector('.work-link[href="#' + key + '"]') || lastFocus;
+        if (btn) { btn.scrollIntoView({ block: 'center' }); btn.focus({ preventScroll: true }); }
+      }
+      if (reduce.matches) return done();
+      layer.classList.add('is-leaving');
+      setTimeout(done, 300);
+    }
+    function route() {
+      var key = location.hash.slice(1);
+      if (keys.indexOf(key) > -1) open(key); else close();
+    }
+    function leave() {
+      var fromList = false;
+      try { fromList = !!(history.state && history.state.fromList) && location.hash.length > 1; } catch (err) {}
+      if (fromList) { history.back(); setTimeout(function () { if (current) close(); }, 350); }
+      else { try { history.replaceState(null, '', location.pathname + location.search); } catch (err) {} close(); }
+    }
+
+    // 打開：列表的「看作品」按鈕、封面圖
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest('a[href^="#"]');
+      if (!a) return;
+      var key = a.getAttribute('href').slice(1);
+      if (keys.indexOf(key) > -1) { e.preventDefault(); setUrl(key, !current); open(key); }
+    });
+    works.forEach(function (w, i) {
+      var cover = w.querySelector('.work-cover');
+      if (cover) cover.addEventListener('click', function () { setUrl(keys[i], true); open(keys[i]); });
+    });
+
+    // 索引標籤：點擊或用左右鍵切換作品
+    tabs.forEach(function (t, i) {
+      t.addEventListener('click', function () { if (t.dataset.key !== current) { var d = keys.indexOf(t.dataset.key) - keys.indexOf(current); setUrl(t.dataset.key, false); show(t.dataset.key, false, d); } });
+      t.addEventListener('keydown', function (e) {
+        var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (e.key === 'Home') d = -i; if (e.key === 'End') d = tabs.length - 1 - i;
+        if (!d) return;
+        e.preventDefault();
+        var k = tabs[(i + d + tabs.length) % tabs.length].dataset.key;
+        setUrl(k, false); show(k, true, d);
+      });
+    });
+
+    // 關閉：×、點上方變暗的地方、Esc、返回鍵、把文件夾往下拖
+    layer.querySelector('.case-close').addEventListener('click', leave);
+    layer.querySelector('.case-backdrop').addEventListener('click', leave);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && current) leave(); });
+    window.addEventListener('popstate', route);
+    window.addEventListener('hashchange', route);
+
+    // 手機：在作品內容上左右滑動，切換到上一個／下一個作品（第一個往右、最後一個往左會有阻力，不會繞回去）
+    var sw = null, hint = layer.querySelector('.swipe-hint'), hintTimer = 0, hintDone = false;
+    function hideHint() { clearTimeout(hintTimer); hint.classList.remove('is-shown'); }
+    function showHintOnce() {
+      if (hintDone || !window.matchMedia('(pointer: coarse)').matches) return;
+      hintDone = true;
+      try { if (sessionStorage.getItem('swipeHint')) return; sessionStorage.setItem('swipeHint', '1'); } catch (err) {}
+      setTimeout(function () { hint.classList.add('is-shown'); }, 700);
+      hintTimer = setTimeout(hideHint, 4200);
+    }
+    function go(step) {
+      var i = keys.indexOf(current) + step;
+      if (i < 0 || i >= keys.length) return false;
+      setUrl(keys[i], false); show(keys[i], false, step);
+      hideHint();
+      return true;
+    }
+    body.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' || !current) return;
+      sw = { x: e.clientX, y: e.clientY, dx: 0, on: false, id: e.pointerId, el: layer.querySelector('#case-' + current) };
+    });
+    body.addEventListener('pointermove', function (e) {
+      if (!sw || e.pointerId !== sw.id) return;
+      var dx = e.clientX - sw.x, dy = e.clientY - sw.y;
+      if (!sw.on) {
+        if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy) * 1.5) { sw.on = true; sw.el.classList.add('is-swiping'); }
+        else if (Math.abs(dy) > 12) { sw = null; return; }
+        else return;
+      }
+      var i = keys.indexOf(current), edge = (dx > 0 && i === 0) || (dx < 0 && i === keys.length - 1);
+      sw.dx = dx;
+      var shown = edge ? dx * .25 : dx * .8;   // 已經是第一個／最後一個時只拖得動一點點
+      sw.el.style.transform = 'translateX(' + shown + 'px)';
+      sw.el.style.opacity = 1 - Math.min(Math.abs(shown) / 600, .4);
+    });
+    function endSwipe(e) {
+      if (!sw || (e && e.pointerId !== sw.id)) return;
+      var s = sw; sw = null;
+      if (!s.on) return;
+      s.el.classList.remove('is-swiping');
+      var moved = Math.abs(s.dx) > Math.min(90, body.clientWidth * .22) && go(s.dx < 0 ? 1 : -1);
+      if (moved) { s.el.style.transform = ''; s.el.style.opacity = ''; return; }
+      s.el.classList.add('is-snapping');
+      s.el.style.transform = ''; s.el.style.opacity = '';
+      setTimeout(function () { s.el.classList.remove('is-snapping'); }, 260);
+    }
+    body.addEventListener('pointerup', endSwipe);
+    body.addEventListener('pointercancel', endSwipe);
+
+    var bar = layer.querySelector('.folder-tabs'), drag = null;
+    bar.addEventListener('pointerdown', function (e) {
+      if (e.button !== 0) return;
+      drag = { y: e.clientY, x: e.clientX, dy: 0, on: false, id: e.pointerId };
+    });
+    window.addEventListener('pointermove', function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var dy = e.clientY - drag.y, dx = e.clientX - drag.x;
+      if (!drag.on) {
+        if (dy > 8 && Math.abs(dy) > Math.abs(dx)) { drag.on = true; folder.classList.add('is-dragging'); try { bar.setPointerCapture(e.pointerId); } catch (err) {} }
+        else if (Math.abs(dx) > 8 || dy < -8) { drag = null; return; }
+        else return;
+      }
+      drag.dy = Math.max(0, dy);
+      folder.style.setProperty('--drag', drag.dy + 'px');
+    });
+    function endDrag() {
+      if (!drag) return;
+      var d = drag; drag = null;
+      if (!d.on) return;
+      folder.classList.remove('is-dragging');
+      var block = function (ev) { ev.stopPropagation(); ev.preventDefault(); };
+      window.addEventListener('click', block, { capture: true, once: true });   // 拖完放手不要順便點到標籤
+      setTimeout(function () { window.removeEventListener('click', block, true); }, 0);
+      if (d.dy > Math.min(160, folder.offsetHeight * .22)) {
+        folder.classList.add('is-settling');
+        folder.style.setProperty('--drag', folder.offsetHeight + 'px');
+        setTimeout(function () { folder.classList.remove('is-settling'); layer.classList.add('no-anim'); leave(); }, 300);
+      } else {
+        folder.classList.add('is-settling');
+        folder.style.setProperty('--drag', '0px');
+        setTimeout(function () { folder.classList.remove('is-settling'); }, 300);
+      }
+    }
+    window.addEventListener('pointerup', endDrag);
+    window.addEventListener('pointercancel', endDrag);
+
+    route();
+  })();
+</script>
+</body>
+</html>
