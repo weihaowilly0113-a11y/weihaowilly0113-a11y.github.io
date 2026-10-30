@@ -62,7 +62,46 @@
     text-decoration: none;
   }
   .site-nav { display: flex; gap: clamp(16px, 3vw, 32px); }
-  .site-nav a { font-weight: 500; font-size: 15px; text-decoration: none; }
+  .site-nav a { font-weight: 500; font-size: 15px; text-decoration: none; white-space: nowrap; }
+  .brand { white-space: nowrap; }
+  .menu-btn { display: none; }
+
+  /* 窄螢幕：三個連結收進「選單」，點開後從頁首下方展開 */
+  @media (max-width: 600px) {
+    .menu-btn {
+      display: flex; align-items: center; gap: 8px;
+      margin: -8px -10px -8px 0; padding: 8px 10px;
+      font: inherit; font-size: 14px; font-weight: 700; line-height: 1;
+      color: inherit; background: none; border: 0; cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .menu-icon { position: relative; width: 18px; height: 10px; }
+    .menu-icon::before, .menu-icon::after {
+      content: ""; position: absolute; left: 0; right: 0; height: 2px; border-radius: 2px;
+      background: currentColor; transition: transform .25s;
+    }
+    .menu-icon::before { top: 0; }
+    .menu-icon::after { bottom: 0; }
+    .menu-open .menu-icon::before { transform: translateY(4px) rotate(45deg); }
+    .menu-open .menu-icon::after { transform: translateY(-4px) rotate(-45deg); }
+    .site-nav {
+      position: absolute; top: 100%; left: 0; right: 0;
+      flex-direction: column; gap: 0;
+      padding: 4px var(--gutter) 20px;
+      background: var(--paper); color: var(--ink);
+      border-bottom: 2px solid var(--ink);
+      visibility: hidden; opacity: 0; transform: translateY(-8px);
+      transition: opacity .2s, transform .2s, visibility 0s .2s;
+    }
+    .site-header .site-nav a {
+      font-family: var(--font-display); font-size: 32px; font-weight: 900; line-height: 1.2;
+      padding: 10px 0; border-top: 1px solid rgba(17,17,17,.15);
+    }
+    .site-nav a:first-child { border-top: 0; }
+    .site-nav a:hover { color: var(--blue); text-decoration: none; }
+    .site-header.menu-open { background: var(--paper); color: var(--ink); }
+    .menu-open .site-nav { visibility: visible; opacity: 1; transform: none; transition: opacity .2s, transform .2s; }
+  }
   .site-nav a:hover { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px; }
 
   /* ---------- 主視覺：整片群青，捲動時被米白區塊蓋過 ---------- */
@@ -140,9 +179,9 @@
   .sticker.is-dragging { filter: drop-shadow(0 18px 18px rgba(0, 0, 0, .35)); }
   .is-measuring [data-drag] { transform: none !important; transition: none !important; }
   .is-resetting .ch { transition: transform .6s cubic-bezier(.2,.8,.2,1); }
-  /* 手機上字母太大，拖曳會擋住捲動，所以只讓貼紙能拖 */
+  /* 手機：字母佔了大半個畫面，直向滑動還是交給捲動；往左右拖、或按住一下再拖，才會抓起字母 */
   @media (pointer: coarse) {
-    .ch[data-drag] { touch-action: auto; cursor: auto; }
+    .ch[data-drag] { touch-action: pan-y; cursor: auto; -webkit-touch-callout: none; }
   }
 
   .sticker {
@@ -352,10 +391,12 @@
 
   /* ---------- 聯絡：回到群青 ---------- */
   .contact {
-    position: relative; z-index: 2;
+    position: relative; z-index: 1;
     background: var(--blue);
     color: var(--white);
-    padding: clamp(72px, 10vw, 140px) var(--gutter) 32px;
+    /* 往上墊到米白區塊的圓角後面，圓角外露出的是聯絡區的藍，不是主視覺的字母和貼紙 */
+    margin-top: calc(var(--radius-sheet) * -1);
+    padding: calc(clamp(72px, 10vw, 140px) + var(--radius-sheet)) var(--gutter) 32px;
   }
   .contact-title {
     font-weight: 900;
@@ -381,6 +422,7 @@
   .work-cover:hover img { transform: scale(1.03); }
 
   html.case-open, html.case-open body { overflow: hidden; }
+  html.case-open .site-header { visibility: hidden; }   /* 看作品時藏起頁首，上方暗色空間才乾淨 */
   .case-layer { position: fixed; inset: 0; z-index: 300000; }
   .case-layer[hidden] { display: none; }
   .case-layer.no-anim .folder, .case-layer.no-anim .case-backdrop { animation: none !important; }
@@ -389,7 +431,8 @@
   .folder {
     --tab-h: 52px;
     position: absolute; left: clamp(0px, 2vw, 32px); right: clamp(0px, 2vw, 32px); bottom: 0;
-    top: clamp(28px, 6svh, 64px);
+    --gap: clamp(28px, 6svh, 64px);
+    top: var(--gap);
     display: flex; flex-direction: column;
     transform: translateY(var(--drag, 0px));
   }
@@ -453,18 +496,22 @@
     border-radius: 0 28px 0 0;
   }
   .folder { --case-pad: clamp(32px, 4vw, 56px); --title-size: clamp(40px, 5.2vw, 80px); }
+  /* 關閉：放在文件夾外、上方變暗的地方，跟內容分開，不會一直蓋在作品上 */
   .case-close {
     position: absolute; z-index: 3;
-    /* 跟作品名稱第一行的中線對齊：標籤高度＋內容上方留白＋（標題行高 − 按鈕高度）÷ 2 */
-    top: calc(var(--tab-h) + var(--case-pad) + (var(--title-size) * 1.1 - 44px) / 2);
-    right: clamp(16px, 4vw, 56px);
-    width: 44px; height: 44px; border-radius: 50%;
-    font: inherit; font-size: 26px; line-height: 1; font-weight: 500;
-    color: var(--ink); background: var(--yellow);
-    border: 2px solid var(--ink); box-shadow: 0 4px 0 var(--ink);
-    cursor: pointer; transition: transform .08s ease-out, box-shadow .08s ease-out;
+    top: calc((var(--tab-h) - 40px) / 2); right: 0;   /* 桌機：跟索引標籤同一列，在最右邊 */
+    display: flex; align-items: center; gap: 6px;
+    height: 40px; padding: 0 14px 0 12px; border-radius: 999px;
+    font: inherit; font-size: 15px; font-weight: 700; line-height: 1;
+    color: var(--white); background: rgba(17, 17, 17, .55);
+    border: 1.5px solid rgba(255, 255, 255, .55);
+    cursor: pointer; transition: background-color .15s, transform .08s;
+    -webkit-tap-highlight-color: transparent;
   }
-  .case-close:active { transform: translateY(4px); box-shadow: 0 0 0 var(--ink); }
+  .case-close svg { width: 14px; height: 14px; }
+  .case-close:hover { background: rgba(17, 17, 17, .8); }
+  .case-close:active { transform: scale(.94); }
+  .case-close:focus-visible { outline-color: var(--yellow); }
   .case-layer :focus-visible { outline-color: var(--blue); }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -499,24 +546,26 @@
     transition: opacity .35s, transform .35s;
   }
   .swipe-hint.is-shown { opacity: 1; transform: translate(-50%, 0); }
-  .case-head {
-    display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: clamp(20px, 4vw, 64px); align-items: start;
-    padding-bottom: clamp(28px, 4vw, 48px);
+  /* 左欄：名稱、標籤、基本資料、連結，捲動時停在原位；右欄：描述與圖片 */
+  .case-grid {
+    display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: clamp(28px, 4vw, 72px); align-items: start;
   }
-  .case-title { font-weight: 900; font-size: var(--title-size); line-height: 1.1; outline: none; padding-right: 60px; }
-  .case-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+  .case-side { position: sticky; top: var(--case-pad); }
+  .case-title { font-weight: 900; font-size: var(--title-size); line-height: 1.1; outline: none; }
+  .case-sub { margin-top: 6px; font-weight: 700; color: var(--blue); }
+  .case-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
   .case-ext {
     font-weight: 700; font-size: 15px; text-decoration: none;
     padding: 9px 16px; border-radius: 999px; border: 2px solid var(--ink); background: var(--white);
   }
   .case-ext::after { content: " ↗"; }
   .case-ext:hover { background: var(--ink); color: var(--white); }
-  .case-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; padding-top: 6px; }
-  .case-meta div { padding: 10px 0; border-top: 1px solid rgba(17,17,17,.18); }
-  .case-meta dt { font-size: 13px; font-weight: 700; color: var(--blue); }
-  .case-meta dd { margin-top: 2px; font-weight: 500; }
-  .case-desc { margin-top: 20px; max-width: 34em; }
+  .case-meta { margin-top: 28px; display: grid; }
+  .case-meta div { display: grid; grid-template-columns: 4.5em 1fr; gap: 12px; padding: 10px 0; border-top: 1px solid rgba(17,17,17,.15); }
+  .case-meta div:last-child { border-bottom: 1px solid rgba(17,17,17,.15); }
+  .case-meta dt { font-weight: 700; color: var(--blue); }
+  .case-desc { font-size: clamp(18px, 1.5vw, 21px); font-weight: 700; line-height: 1.7; max-width: 34em; margin-bottom: clamp(24px, 3vw, 40px); }
 
   /* 圖片像 Behance 一樣無縫往下接：沒有間距、沒有外框 */
   .case-gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-radius: 14px; overflow: hidden; }
@@ -533,12 +582,14 @@
   .g-slot:nth-child(even) { background: #E4DDCF; }
 
   @media (max-width: 760px) {
-    .folder { --tab-h: 46px; left: 0; right: 0; }
+    .folder { --tab-h: 46px; --gap: 60px; left: 0; right: 0; }
+    /* 手機：標籤佔滿整列，關閉鈕改放在文件夾上方露出的那條暗色空間 */
+    .case-close { top: auto; bottom: calc(100% + (var(--gap) - 40px) / 2); right: 12px; }
     .folder-body { border-radius: 0; }   /* 手機上文件夾貼齊螢幕邊緣，右上角不做圓角，最右邊的標籤才不會跟圓角之間留下缺口 */
     .case-gallery { border-radius: 10px; }
-    .case-head { grid-template-columns: 1fr; }
+    .case-grid { grid-template-columns: 1fr; }
+    .case-side { position: static; }
     .folder { --title-size: 38px; }
-    .case-meta { grid-template-columns: 1fr 1fr; }
     .case-gallery { grid-template-columns: 1fr; }
     .g-item.g-half { grid-column: 1 / -1; }
   }
@@ -569,7 +620,8 @@
 
 <header class="site-header" id="siteHeader">
   <a class="brand" href="#top">WEI HAO HUANG</a>
-  <nav class="site-nav" aria-label="主選單">
+  <button class="menu-btn" type="button" aria-expanded="false" aria-controls="siteNav"><span class="menu-label">選單</span><span class="menu-icon" aria-hidden="true"></span></button>
+  <nav class="site-nav" id="siteNav" aria-label="主選單">
     <a href="#works">作品</a>
     <a href="#about">關於</a>
     <a href="#contact">聯絡</a>
@@ -713,39 +765,79 @@
   <div class="case-backdrop" data-close></div>
   <div class="folder" role="dialog" aria-modal="true" aria-label="作品介紹">
     <div class="folder-tabs" role="tablist" aria-label="作品"><button class="folder-tab" type="button" role="tab" id="tab-park" data-key="park" aria-controls="case-park" aria-selected="false" tabindex="-1"><span class="tab-label">台灣好樂園</span></button><button class="folder-tab" type="button" role="tab" id="tab-race" data-key="race" aria-controls="case-race" aria-selected="false" tabindex="-1"><span class="tab-label">全國賽會</span></button><button class="folder-tab" type="button" role="tab" id="tab-steel" data-key="steel" aria-controls="case-steel" aria-selected="false" tabindex="-1"><span class="tab-label">恆鐏鋼鐵</span></button><button class="folder-tab" type="button" role="tab" id="tab-myday" data-key="myday" aria-controls="case-myday" aria-selected="false" tabindex="-1"><span class="tab-label">MYDAY</span></button><button class="folder-tab" type="button" role="tab" id="tab-game" data-key="game" aria-controls="case-game" aria-selected="false" tabindex="-1"><span class="tab-label">坐桶仔</span></button></div>
-    <button class="case-close" type="button" aria-label="關閉作品介紹">×</button>
+    <button class="case-close" type="button" aria-label="關閉作品介紹"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M1.5 1.5l11 11M12.5 1.5l-11 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span aria-hidden="true">關閉</span></button>
     <p class="swipe-hint" aria-hidden="true">← 左右滑動切換作品 →</p>
     <div class="folder-body">
       <article class="case" id="case-park" data-key="park" role="tabpanel" aria-labelledby="case-park-title" hidden>
-      <header class="case-head">
-        <div><h2 class="case-title" id="case-park-title" tabindex="-1">台灣好樂園</h2><div class="case-links"><a class="case-ext" href="https://fcu-11504-themepark.dev-hub.io/index.html" target="_blank" rel="noopener">上線網站<span class="sr-only">（另開新視窗）</span></a><a class="case-ext" href="https://weihaowilly0113-a11y.github.io/park-brief/" target="_blank" rel="noopener">完整簡報<span class="sr-only">（另開新視窗）</span></a></div></div>
-        <div><dl class="case-meta"><div><dt>年份</dt><dd>2026</dd></div><div><dt>類型</dt><dd>網站改版</dd></div><div><dt>團隊</dt><dd>設計 2 人、前端 2 人</dd></div><div><dt>我負責</dt><dd>首頁以外的頁面設計、Wireframe、元件庫、JS 互動</dd></div></dl><p class="case-desc">以「依目的找樂園」為出發點，重新梳理主題樂園平台的資訊架構。以全台樂園地圖串起樂園、活動與遊玩資訊，並延續觀光署的品牌形象，建立一套能跨裝置沿用的設計系統。</p></div>
-      </header>
-      <div class="case-gallery"><figure class="g-item g-hero"></figure><figure class="g-item g-slot"><span>簡報頁：資訊架構重整</span></figure><figure class="g-item g-slot"><span>簡報頁：線框稿規劃</span></figure><figure class="g-item"><img src="images/park-devices.webp" alt="最新消息頁在筆電、平板、手機上的畫面" loading="lazy"></figure><figure class="g-item"><img src="images/park-monitor.webp" alt="樂玩日誌頁" loading="lazy"></figure><figure class="g-item g-half"><img src="images/park-float.webp" alt="手機與平板上的最新消息頁" loading="lazy"></figure><figure class="g-item g-slot g-half"><span>簡報頁：手機版的三個取捨</span></figure><figure class="g-item g-slot"><span>簡報頁：設計系統與元件庫</span></figure><figure class="g-item"><img src="images/park-laptop.webp" alt="筆電上的最新消息頁" loading="lazy"></figure></div>
+      <div class="case-grid">
+        <aside class="case-side">
+          <h2 class="case-title" id="case-park-title" tabindex="-1">台灣好樂園</h2>
+          <p class="case-sub">主題樂園資訊平台改版</p>
+          <ul class="tags"><li>UI/UX</li><li>網站改版</li><li>設計系統</li></ul>
+          <dl class="case-meta"><div><dt>年份</dt><dd>2026</dd></div><div><dt>類型</dt><dd>課程專案・網站改版提案</dd></div><div><dt>團隊</dt><dd>4 人（設計 2、前端 2）</dd></div><div><dt>我負責</dt><dd>首頁以外的頁面設計、Wireframe、元件庫、JS 互動實作</dd></div></dl>
+          <div class="case-links"><a class="case-ext" href="https://fcu-11504-themepark.dev-hub.io/index.html" target="_blank" rel="noopener">上線網站<span class="sr-only">（另開新視窗）</span></a><a class="case-ext" href="https://weihaowilly0113-a11y.github.io/park-brief/" target="_blank" rel="noopener">完整簡報<span class="sr-only">（另開新視窗）</span></a></div>
+        </aside>
+        <div class="case-main">
+          <p class="case-desc">以「依目的找樂園」為出發點，重新梳理主題樂園平台的資訊架構。以全台樂園地圖串起樂園、活動與遊玩資訊，並延續觀光署的品牌形象，建立一套能跨裝置沿用的設計系統。</p>
+          <div class="case-gallery"><figure class="g-item g-hero"></figure><figure class="g-item g-slot"><span>簡報頁：資訊架構重整</span></figure><figure class="g-item g-slot"><span>簡報頁：線框稿規劃</span></figure><figure class="g-item"><img src="images/park-devices.webp" alt="最新消息頁在筆電、平板、手機上的畫面" loading="lazy"></figure><figure class="g-item"><img src="images/park-monitor.webp" alt="樂玩日誌頁" loading="lazy"></figure><figure class="g-item g-half"><img src="images/park-float.webp" alt="手機與平板上的最新消息頁" loading="lazy"></figure><figure class="g-item g-slot g-half"><span>簡報頁：手機版的三個取捨</span></figure><figure class="g-item g-slot"><span>簡報頁：設計系統與元件庫</span></figure><figure class="g-item"><img src="images/park-laptop.webp" alt="筆電上的最新消息頁" loading="lazy"></figure></div>
+        </div>
+      </div>
     </article><article class="case" id="case-race" data-key="race" role="tabpanel" aria-labelledby="case-race-title" hidden>
-      <header class="case-head">
-        <div><h2 class="case-title" id="case-race-title" tabindex="-1">全國賽會</h2><div class="case-links"><a class="case-ext" href="https://weihaowilly0113-a11y.github.io/race-brief/" target="_blank" rel="noopener">完整簡報<span class="sr-only">（另開新視窗）</span></a></div></div>
-        <div><dl class="case-meta"><div><dt>年份</dt><dd>2026</dd></div><div><dt>類型</dt><dd>網站改版</dd></div><div><dt>團隊</dt><dd>3 人</dd></div><div><dt>我負責</dt><dd>賽事卡片、電腦版與手機版的比較功能</dd></div></dl><p class="case-desc">「跑者廣場」的全國賽會專區收錄全台路跑、超馬、越野與鐵人賽事，原本卻只是一張長長的表格。改版後以賽事卡片搭配篩選與並排比較，讓跑者不用來回翻找，就能挑出最適合自己的那一場。</p></div>
-      </header>
-      <div class="case-gallery"><figure class="g-item g-hero"></figure><figure class="g-item g-slot"><span>簡報頁：原網站與問題</span></figure><figure class="g-item g-slot"><span>簡報頁：人物誌</span></figure><figure class="g-item g-slot"><span>簡報頁：賽事卡片的狀態</span></figure><figure class="g-item"><img src="images/race-laptop.webp" alt="筆電上的賽事比較視窗" loading="lazy"></figure><figure class="g-item"><img src="images/race-phone.webp" alt="手機上的賽事比較結果" loading="lazy"></figure><figure class="g-item g-slot"><span>簡報頁：手機版 V1→V4 迭代</span></figure></div>
+      <div class="case-grid">
+        <aside class="case-side">
+          <h2 class="case-title" id="case-race-title" tabindex="-1">全國賽會</h2>
+          <p class="case-sub">賽事搜尋與比較</p>
+          <ul class="tags"><li>UI/UX</li><li>互動設計</li></ul>
+          <dl class="case-meta"><div><dt>年份</dt><dd>2026</dd></div><div><dt>類型</dt><dd>課程專案・網站改版提案</dd></div><div><dt>團隊</dt><dd>3 人</dd></div><div><dt>我負責</dt><dd>賽事卡片、電腦版與手機版的比較功能</dd></div></dl>
+          <div class="case-links"><a class="case-ext" href="https://weihaowilly0113-a11y.github.io/race-brief/" target="_blank" rel="noopener">完整簡報<span class="sr-only">（另開新視窗）</span></a></div>
+        </aside>
+        <div class="case-main">
+          <p class="case-desc">「跑者廣場」的全國賽會專區收錄全台路跑、超馬、越野與鐵人賽事，原本卻只是一張長長的表格。改版後以賽事卡片搭配篩選與並排比較，讓跑者不用來回翻找，就能挑出最適合自己的那一場。</p>
+          <div class="case-gallery"><figure class="g-item g-hero"></figure><figure class="g-item g-slot"><span>簡報頁：原網站與問題</span></figure><figure class="g-item g-slot"><span>簡報頁：人物誌</span></figure><figure class="g-item g-slot"><span>簡報頁：賽事卡片的狀態</span></figure><figure class="g-item"><img src="images/race-laptop.webp" alt="筆電上的賽事比較視窗" loading="lazy"></figure><figure class="g-item"><img src="images/race-phone.webp" alt="手機上的賽事比較結果" loading="lazy"></figure><figure class="g-item g-slot"><span>簡報頁：手機版 V1→V4 迭代</span></figure></div>
+        </div>
+      </div>
     </article><article class="case" id="case-steel" data-key="steel" role="tabpanel" aria-labelledby="case-steel-title" hidden>
-      <header class="case-head">
-        <div><h2 class="case-title" id="case-steel-title" tabindex="-1">恆鐏鋼鐵</h2><div class="case-links"><a class="case-ext" href="https://www.behance.net/e80a02a0" target="_blank" rel="noopener">Behance<span class="sr-only">（另開新視窗）</span></a></div></div>
-        <div><dl class="case-meta"><div><dt>年份</dt><dd>2025</dd></div><div><dt>類型</dt><dd>接案・企業形象網站</dd></div><div><dt>我負責</dt><dd>網站 UI 設計</dd></div></dl><p class="case-desc">為鋼鐵訂製品牌打造的形象網站。以深色基調與飛濺的火花帶出「質感工業，專屬打造」的品牌個性，搭配清楚的服務介紹，讓工藝感與專業度一眼可見。</p></div>
-      </header>
-      <div class="case-gallery"><figure class="g-item g-hero"></figure><figure class="g-item g-slot"><span>簡報頁：首頁完整畫面</span></figure><figure class="g-item g-slot"><span>簡報頁：服務介紹</span></figure><figure class="g-item g-slot g-half"><span>簡報頁：手機版</span></figure><figure class="g-item g-slot g-half"><span>簡報頁：其他頁面</span></figure></div>
+      <div class="case-grid">
+        <aside class="case-side">
+          <h2 class="case-title" id="case-steel-title" tabindex="-1">恆鐏鋼鐵</h2>
+          <p class="case-sub">鋼鐵訂製品牌形象網站</p>
+          <ul class="tags"><li>UI 設計</li><li>形象網站</li><li>接案</li></ul>
+          <dl class="case-meta"><div><dt>年份</dt><dd>2025</dd></div><div><dt>類型</dt><dd>接案・企業形象網站</dd></div><div><dt>我負責</dt><dd>網站 UI 設計</dd></div></dl>
+          <div class="case-links"><a class="case-ext" href="https://www.behance.net/e80a02a0" target="_blank" rel="noopener">Behance<span class="sr-only">（另開新視窗）</span></a></div>
+        </aside>
+        <div class="case-main">
+          <p class="case-desc">為鋼鐵訂製品牌打造的形象網站。以深色基調與飛濺的火花帶出「質感工業，專屬打造」的品牌個性，搭配清楚的服務介紹，讓工藝感與專業度一眼可見。</p>
+          <div class="case-gallery"><figure class="g-item g-hero"></figure><figure class="g-item g-slot"><span>簡報頁：首頁完整畫面</span></figure><figure class="g-item g-slot"><span>簡報頁：服務介紹</span></figure><figure class="g-item g-slot g-half"><span>簡報頁：手機版</span></figure><figure class="g-item g-slot g-half"><span>簡報頁：其他頁面</span></figure></div>
+        </div>
+      </div>
     </article><article class="case" id="case-myday" data-key="myday" role="tabpanel" aria-labelledby="case-myday-title" hidden>
-      <header class="case-head">
-        <div><h2 class="case-title" id="case-myday-title" tabindex="-1">MYDAY</h2><div class="case-links"><a class="case-ext" href="https://www.behance.net/e80a02a0" target="_blank" rel="noopener">Behance<span class="sr-only">（另開新視窗）</span></a></div></div>
-        <div><dl class="case-meta"><div><dt>年份</dt><dd>2024–2025</dd></div><div><dt>類型</dt><dd>個人專案・App 改版</dd></div><div><dt>我負責</dt><dd>研究、設計與測試，一人完成</dd></div></dl><p class="case-desc">一款代購 App 的兩階段改版。從使用者訪談出發，重新整理搜尋、比價到委託的流程，讓委託從五個步驟縮短為三步，再建立一套統一的字體、色彩與間距規範。</p></div>
-      </header>
-      <div class="case-gallery"><figure class="g-item g-hero"></figure><figure class="g-item g-slot"><span>簡報頁：訪談與人物誌</span></figure><figure class="g-item g-slot"><span>簡報頁：委託流程：五步到三步</span></figure><figure class="g-item g-slot g-half"><span>簡報頁：主要畫面</span></figure><figure class="g-item g-slot g-half"><span>簡報頁：主要畫面</span></figure><figure class="g-item g-slot"><span>簡報頁：設計系統</span></figure></div>
+      <div class="case-grid">
+        <aside class="case-side">
+          <h2 class="case-title" id="case-myday-title" tabindex="-1">MYDAY</h2>
+          <p class="case-sub">代購 App 兩階段改版</p>
+          <ul class="tags"><li>UI/UX</li><li>App 改版</li><li>使用者研究</li><li>設計系統</li></ul>
+          <dl class="case-meta"><div><dt>年份</dt><dd>2024–2025</dd></div><div><dt>類型</dt><dd>個人專案</dd></div><div><dt>我負責</dt><dd>研究、設計與測試，一人完成</dd></div></dl>
+          <div class="case-links"><a class="case-ext" href="https://www.behance.net/e80a02a0" target="_blank" rel="noopener">Behance<span class="sr-only">（另開新視窗）</span></a></div>
+        </aside>
+        <div class="case-main">
+          <p class="case-desc">一款代購 App 的兩階段改版。從使用者訪談出發，重新整理搜尋、比價到委託的流程，讓委託從五個步驟縮短為三步，再建立一套統一的字體、色彩與間距規範。</p>
+          <div class="case-gallery"><figure class="g-item g-hero"></figure><figure class="g-item g-slot"><span>簡報頁：訪談與人物誌</span></figure><figure class="g-item g-slot"><span>簡報頁：委託流程：五步到三步</span></figure><figure class="g-item g-slot g-half"><span>簡報頁：主要畫面</span></figure><figure class="g-item g-slot g-half"><span>簡報頁：主要畫面</span></figure><figure class="g-item g-slot"><span>簡報頁：設計系統</span></figure></div>
+        </div>
+      </div>
     </article><article class="case" id="case-game" data-key="game" role="tabpanel" aria-labelledby="case-game-title" hidden>
-      <header class="case-head">
-        <div><h2 class="case-title" id="case-game-title" tabindex="-1">坐桶仔</h2><div class="case-links"><a class="case-ext" href="https://www.behance.net/e80a02a0" target="_blank" rel="noopener">Behance<span class="sr-only">（另開新視窗）</span></a></div></div>
-        <div><dl class="case-meta"><div><dt>年份</dt><dd>2023</dd></div><div><dt>類型</dt><dd>畢業製作・桌遊</dd></div><div><dt>版本</dt><dd>華語版、台語版</dd></div><div><dt>我負責</dt><dd>規劃、美術、包裝與印刷，一人完成</dd></div></dl><p class="case-desc">以台灣海上妖怪傳說為題的卡牌桌遊，推出華語與台語兩個版本，讓孩子在遊戲的過程中，認識流傳在台灣海邊的在地故事。</p></div>
-      </header>
-      <div class="case-gallery"><figure class="g-item g-hero"></figure><figure class="g-item"><img src="images/game-contents.webp" alt="坐桶仔的盒子、說明書、代幣與卡牌" loading="lazy"></figure><figure class="g-item g-half"><img src="images/game-tokens.webp" alt="木頭代幣與彩色妖怪卡牌" loading="lazy"></figure><figure class="g-item g-slot g-half"><span>簡報頁：妖怪卡牌設計</span></figure><figure class="g-item g-slot"><span>簡報頁：玩法說明</span></figure></div>
+      <div class="case-grid">
+        <aside class="case-side">
+          <h2 class="case-title" id="case-game-title" tabindex="-1">坐桶仔</h2>
+          <p class="case-sub">畢業製作｜台灣海怪桌遊（華語／台語版）</p>
+          <ul class="tags"><li>遊戲設計</li><li>平面設計</li><li>印刷</li></ul>
+          <dl class="case-meta"><div><dt>年份</dt><dd>2023</dd></div><div><dt>類型</dt><dd>畢業製作</dd></div><div><dt>版本</dt><dd>華語版、台語版</dd></div><div><dt>我負責</dt><dd>遊戲規劃、美術、包裝與印刷，一人完成</dd></div></dl>
+          <div class="case-links"><a class="case-ext" href="https://www.behance.net/e80a02a0" target="_blank" rel="noopener">Behance<span class="sr-only">（另開新視窗）</span></a></div>
+        </aside>
+        <div class="case-main">
+          <p class="case-desc">以台灣海上妖怪傳說為題的卡牌桌遊，推出華語與台語兩個版本，讓孩子在遊戲的過程中，認識流傳在台灣海邊的在地故事。</p>
+          <div class="case-gallery"><figure class="g-item g-hero"></figure><figure class="g-item"><img src="images/game-contents.webp" alt="坐桶仔的盒子、說明書、代幣與卡牌" loading="lazy"></figure><figure class="g-item g-half"><img src="images/game-tokens.webp" alt="木頭代幣與彩色妖怪卡牌" loading="lazy"></figure><figure class="g-item g-slot g-half"><span>簡報頁：妖怪卡牌設計</span></figure><figure class="g-item g-slot"><span>簡報頁：玩法說明</span></figure></div>
+        </div>
+      </div>
     </article>
     </div>
   </div>
@@ -769,6 +861,21 @@
     }, { passive: true });
     window.addEventListener('resize', update);
     update();
+
+    // 窄螢幕的選單：點按鈕展開／收起；點連結、點外面或按 Esc 收起
+    var btn = header.querySelector('.menu-btn'), label = btn.querySelector('.menu-label');
+    function setMenu(on) {
+      header.classList.toggle('menu-open', on);
+      btn.setAttribute('aria-expanded', on);
+      label.textContent = on ? '關閉' : '選單';
+    }
+    btn.addEventListener('click', function () { setMenu(!header.classList.contains('menu-open')); });
+    header.querySelectorAll('.site-nav a').forEach(function (a) { a.addEventListener('click', function () { setMenu(false); }); });
+    document.addEventListener('click', function (e) { if (!header.contains(e.target)) setMenu(false); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && header.classList.contains('menu-open')) { setMenu(false); btn.focus(); }
+    });
+    window.addEventListener('resize', function () { if (window.innerWidth > 600) setMenu(false); });
   })();
 
   // 字母與貼紙：有重力與碰撞的拖曳（Matter.js）；函式庫沒載入時退回單純拖曳
@@ -786,7 +893,6 @@
 
     function canGrab(el, e) {
       if (e.button !== 0) return false;
-      if (el.classList.contains('ch') && coarse.matches) return false;   // 手機上字母不給拖，避免擋住捲動
       return true;
     }
     function lift(el) { el.classList.add('is-dragging'); el.style.zIndex = ++z; }
@@ -802,9 +908,8 @@
     function physics() {
       var M = window.Matter;
       var engine, objs = [], grab = null, raf = 0, lastWidth = 0, lastTime = 0, acc = 0;
-      // 桌機：字母一開始就是真的物體，疊在一起靠重力站著，碰到就會有反應
-      // 手機：字母固定不動（手指一碰就拖字會擋住捲動）
-      var liveLetters = !coarse.matches;
+      // 字母一開始就是真的物體，疊在一起靠重力站著，碰到就會有反應（手機也一樣）
+      var liveLetters = true;
       var lettersLive = false, rainAt = 0;   // 開場貼紙掉落時字母先固定，名字才不會一開始就被撞歪
       var STEP = 1000 / 60;      // 固定步長：不論螢幕更新率是 60 或 120Hz，速度都一樣
       var MAX_SPEED = 40;        // 速度上限，避免甩太快直接穿過其他物件
@@ -975,9 +1080,10 @@
         raf = requestAnimationFrame(loop);
       }
 
-      function release() {
+      function release(cancelled) {
         if (!grab) return;
         M.Composite.remove(engine.world, grab.c);
+        if (cancelled === true) grab.trail = [];   // 被系統中斷（例如開始捲動）就輕輕放下，不甩出去
         // 甩的力道：用放手前最後一小段的滑鼠速度，讓物件照你甩的方向和速度飛出去
         var tr = grab.trail, last = tr[tr.length - 1], now = performance.now();
         var recent = tr.filter(function (s) { return now - s.t < 150; });
@@ -994,11 +1100,39 @@
         drop(el);
       }
 
+      // 手機上的字母：手指放上去先不抓。往左右拖 → 抓起來；按住約 0.2 秒不動 → 抓起來；往上下滑 → 照常捲動頁面
+      var pending = null;
+      function clearPending() { if (pending) { clearTimeout(pending.timer); pending = null; } }
+      // 已經抓起來之後，手指往上下移動也不要捲動頁面
+      hero.addEventListener('touchmove', function (e) { if (grab && e.cancelable) e.preventDefault(); }, { passive: false });
+
       items.forEach(function (el, i) {
         el.addEventListener('pointerdown', function (e) {
           if (!engine || !objs[i] || !canGrab(el, e)) return;
+          if (e.pointerType !== 'mouse' && objs[i].isCh) {
+            clearPending();
+            var pd = pending = { i: i, id: e.pointerId, x: e.clientX, y: e.clientY, e: e };
+            pd.timer = setTimeout(function () { if (pending === pd) { pending = null; startGrab(el, i, pd.e); } }, 200);
+            return;
+          }
           e.preventDefault();
-          el.setPointerCapture(e.pointerId);
+          startGrab(el, i, e);
+        });
+        el.addEventListener('pointermove', function (e) {
+          if (!pending || pending.i !== i || pending.id !== e.pointerId) return;
+          var dx = e.clientX - pending.x, dy = e.clientY - pending.y;
+          pending.e = e;
+          if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+          var horizontal = Math.abs(dx) > Math.abs(dy);
+          clearPending();
+          if (horizontal) startGrab(el, i, e);
+        });
+        el.addEventListener('pointerup', clearPending);
+        el.addEventListener('pointercancel', clearPending);
+      });
+
+      function startGrab(el, i, e) {
+          try { el.setPointerCapture(e.pointerId); } catch (err) {}
           unpinLetters();                                  // 一碰到就開始物理，不用等貼紙停好
           var o = objs[i], b = o.body, p = heroPoint(e);
           M.Sleeping.set(b, false);
@@ -1013,7 +1147,9 @@
           };
           M.Composite.add(engine.world, grab.c);
           lift(el);
-        });
+      }
+
+      items.forEach(function (el, i) {
         el.addEventListener('pointermove', function (e) {
           if (!grab || grab.o !== objs[i] || !el.hasPointerCapture(e.pointerId)) return;
           var hp = heroPoint(e);
@@ -1024,7 +1160,7 @@
           M.Sleeping.set(grab.o.body, false);
         });
         el.addEventListener('pointerup', function () { if (grab && grab.o === objs[i]) release(); });
-        el.addEventListener('pointercancel', function () { if (grab && grab.o === objs[i]) release(); });
+        el.addEventListener('pointercancel', function () { if (grab && grab.o === objs[i]) release(true); });
       });
 
       // 重來一次：字母滑回原位、先固定；貼紙再掉一次，停好後字母再鬆開
@@ -1176,7 +1312,7 @@
         siblings().forEach(function (el) { el.inert = false; });
         document.title = 'Wei Hao Huang｜UI/UX 設計師';
         var btn = document.querySelector('.work-link[href="#' + key + '"]') || lastFocus;
-        if (btn) { btn.scrollIntoView({ block: 'center' }); btn.focus({ preventScroll: true }); }
+        if (btn) btn.focus({ preventScroll: true });   // 只把焦點還回去，不捲動，畫面停在打開前的位置
       }
       if (reduce.matches) return done();
       layer.classList.add('is-leaving');
