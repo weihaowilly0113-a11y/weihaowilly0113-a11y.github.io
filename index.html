@@ -26,7 +26,7 @@
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; scrollbar-gutter: stable; }   /* 打開作品時頁面停止捲動，捲軸的位置照樣保留，後面的文字不會因為變寬而重新換行 */
   body {
     background: var(--blue);
     color: var(--ink);
@@ -423,7 +423,9 @@
   .work-cover:hover img { transform: scale(1.03); }
 
   html.case-open, html.case-open body { overflow: hidden; }
-  html.case-open .site-header { visibility: hidden; }   /* 看作品時藏起頁首，上方暗色空間才乾淨 */
+  /* 看作品時頁首跟著變暗的背景一起淡出，不是瞬間消失 */
+  .site-header { transition: background-color .25s, color .25s, opacity .3s, visibility 0s; }
+  html.case-open .site-header { opacity: 0; visibility: hidden; transition: background-color .25s, color .25s, opacity .3s, visibility 0s .3s; }
   .case-layer { position: fixed; inset: 0; z-index: 300000; }
   .case-layer[hidden] { display: none; }
   .case-layer.no-anim .folder, .case-layer.no-anim .case-backdrop { animation: none !important; }
@@ -431,7 +433,8 @@
 
   .folder {
     --tab-h: 52px;
-    position: absolute; left: clamp(0px, 2vw, 32px); right: clamp(0px, 2vw, 32px); bottom: 0;
+    --fold-x: clamp(0px, 2vw, 32px);
+    position: absolute; left: var(--fold-x); right: var(--fold-x); bottom: 0;
     --gap: clamp(28px, 6svh, 64px);
     top: var(--gap);
     display: flex; flex-direction: column;
@@ -533,7 +536,8 @@
 
   /* 內容：固定欄位＋一段描述，下面全部是圖片 */
   /* 底部留白放在右欄裡面，而不是整個作品的外面：這樣左右兩欄一路延伸到最底，滑到底時左欄不會被往上推 */
-  .case { padding: var(--case-pad) clamp(16px, 4vw, 56px) 0; }
+  /* 左右留白＝頁面留白 − 文件夾內縮：內容寬度跟作品列表完全一樣，介紹文字的換行位置也會一樣 */
+  .case { padding: var(--case-pad) calc(var(--gutter) - var(--fold-x)) 0; }
   .case-main { padding-bottom: clamp(64px, 8vw, 110px); }
   .case[hidden] { display: none; }
   .folder-body::-webkit-scrollbar { display: none; }
@@ -554,7 +558,7 @@
   /* 左欄：名稱、標籤、介紹、基本資料、連結，捲動時停在原位；右欄：圖片 */
   .case-grid {
     display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);   /* 左欄加寬一點，文字行數變少、整欄變矮 */
-    gap: clamp(28px, 4vw, 64px); align-items: start;
+    gap: clamp(24px, 4vw, 64px); align-items: start;   /* 欄寬、欄距都跟作品列表相同 */
   }
   /* 左欄排得緊湊一點 */
   .case-side .tags { margin-top: 18px; }
@@ -582,7 +586,7 @@
   .case-meta div { display: grid; grid-template-columns: 4.5em 1fr; gap: 12px; padding: 9px 0; border-top: 1px solid rgba(17,17,17,.15); }
   .case-meta div:last-child { border-bottom: 1px solid rgba(17,17,17,.15); }
   .case-meta dt { font-weight: 700; color: var(--blue); }
-  .case-desc { margin-top: 22px; max-width: 34em; }   /* 跟作品列表的介紹文字同樣大小，點進來不會突然變小 */
+  .case-desc { margin-top: 22px; max-width: 32em; }   /* 跟作品列表的介紹文字同樣大小，點進來不會突然變小 */
   /* 電腦版：短的欄位兩兩並排（年份｜類型、團隊…），「我負責」獨佔一整列，整塊矮三分之一左右 */
   @media (min-width: 761px) {
     .case-meta { grid-template-columns: 1fr 1fr; }
@@ -606,7 +610,7 @@
   .g-slot:nth-child(even) { background: #E4DDCF; }
 
   @media (max-width: 760px) {
-    .folder { --tab-h: 46px; --gap: 60px; left: 0; right: 0; }
+    .folder { --tab-h: 46px; --gap: 60px; --fold-x: 0px; }
     /* 手機：標籤佔滿整列，關閉鈕改放在文件夾上方露出的那條暗色空間 */
     .case-close { top: auto; bottom: calc(100% + (var(--gap) - 40px) / 2); right: 12px; }
     .folder-body { border-radius: 0; }   /* 手機上文件夾貼齊螢幕邊緣，右上角不做圓角，最右邊的標籤才不會跟圓角之間留下缺口 */
