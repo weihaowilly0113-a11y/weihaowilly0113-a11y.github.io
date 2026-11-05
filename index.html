@@ -26,7 +26,7 @@
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; scrollbar-gutter: stable; }   /* 打開作品時頁面停止捲動，捲軸的位置照樣保留，後面的文字不會因為變寬而重新換行 */
+  html { scroll-behavior: smooth; --sbw: 0px; }
   body {
     background: var(--blue);
     color: var(--ink);
@@ -423,9 +423,10 @@
   .work-cover:hover img { transform: scale(1.03); }
 
   html.case-open, html.case-open body { overflow: hidden; }
-  /* 看作品時頁首跟著變暗的背景一起淡出，不是瞬間消失 */
-  .site-header { transition: background-color .25s, color .25s, opacity .3s, visibility 0s; }
-  html.case-open .site-header { opacity: 0; visibility: hidden; transition: background-color .25s, color .25s, opacity .3s, visibility 0s .3s; }
+  /* 看作品時背景（包括頁首）維持原樣，只是被暗色蓋住，不做任何變動。
+     頁面停止捲動時捲軸會消失，用同樣寬度的留白補回去，後面的文字就不會變寬、重新換行 */
+  html.case-open body { padding-right: var(--sbw); }
+  html.case-open .site-header { padding-right: calc(var(--gutter) + var(--sbw)); }
   .case-layer { position: fixed; inset: 0; z-index: 300000; }
   .case-layer[hidden] { display: none; }
   .case-layer.no-anim .folder, .case-layer.no-anim .case-backdrop { animation: none !important; }
@@ -434,7 +435,7 @@
   .folder {
     --tab-h: 52px;
     --fold-x: clamp(0px, 2vw, 32px);
-    position: absolute; left: var(--fold-x); right: var(--fold-x); bottom: 0;
+    position: absolute; left: var(--fold-x); right: calc(var(--fold-x) + var(--sbw)); bottom: 0;   /* 跟後面的頁面對齊同一個範圍 */
     --gap: clamp(28px, 6svh, 64px);
     top: var(--gap);
     display: flex; flex-direction: column;
@@ -508,13 +509,13 @@
     top: calc((var(--tab-h) - 40px) / 2); right: 0;   /* 桌機：跟索引標籤同一列，在最右邊 */
     display: grid; place-items: center;
     width: 40px; height: 40px; padding: 0; border-radius: 50%;
-    color: var(--white); background: rgba(17, 17, 17, .55);
+    color: var(--white); background: var(--ink);   /* 不透明：手機上剛好疊在頁首的 ☰ 上面，不會透出來 */
     border: 1.5px solid rgba(255, 255, 255, .55);
     cursor: pointer; transition: background-color .15s, transform .08s;
     -webkit-tap-highlight-color: transparent;
   }
   .case-close svg { width: 14px; height: 14px; }
-  .case-close:hover { background: rgba(17, 17, 17, .8); }
+  .case-close:hover { background: #2a2a2a; }
   .case-close:active { transform: scale(.94); }
   .case-close:focus-visible { outline-color: var(--yellow); }
   .case-layer :focus-visible { outline-color: var(--blue); }
@@ -1327,7 +1328,9 @@
         layer.classList.remove('is-leaving');
         layer.classList.add('is-entering');
         setTimeout(function () { layer.classList.remove('is-entering'); }, 520);
-        document.documentElement.classList.add('case-open');
+        var root = document.documentElement;
+        root.style.setProperty('--sbw', (window.innerWidth - root.clientWidth) + 'px');   // 捲軸寬度（Windows 約 17px，Mac 和手機是 0）
+        root.classList.add('case-open');
         siblings().forEach(function (el) { el.inert = true; });
         layer.querySelector('#case-' + key + ' .case-title').focus({ preventScroll: true });
         if (typeof showHintOnce === 'function') showHintOnce();
