@@ -555,12 +555,19 @@
     gap: clamp(28px, 4vw, 64px); align-items: start;
   }
   /* 左欄排得緊湊一點 */
-  .case-side .tags { margin-top: 14px; }
-  .case-side .tags li { font-size: 13px; padding: 7px 12px; }
+  .case-side .tags { margin-top: 18px; }
+  /* 只有螢幕比較矮的筆電（可視高度 700px 以下）才收緊，讓左欄還是放得進一個畫面 */
+  @media (min-width: 761px) and (max-height: 700px) {
+    .case-side .tags { margin-top: 14px; }
+    .case-side .case-desc { margin-top: 16px; font-size: 15px; line-height: 1.75; }
+    .case-side .case-meta { margin-top: 18px; font-size: 15px; line-height: 1.6; }
+    .case-side .case-meta div { padding: 7px 0; }
+    .case-side .case-links { margin-top: 18px; }
+  }
   .case-side { position: sticky; top: var(--case-pad); }
   .case-title { font-weight: 900; font-size: var(--title-size); line-height: 1.1; outline: none; }
-  .case-sub { margin-top: 4px; font-weight: 700; color: var(--blue); }
-  .case-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .case-sub { margin-top: 6px; font-weight: 700; color: var(--blue); }
+  .case-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
   .case-ext {
     font-weight: 700; font-size: 15px; text-decoration: none;
     padding: 9px 18px; border-radius: 999px; background: var(--ink); color: var(--white);
@@ -568,11 +575,11 @@
   }
   .case-ext::after { content: " ↗"; }
   .case-ext:hover { background: var(--blue); }
-  .case-meta { margin-top: 18px; display: grid; font-size: 15px; line-height: 1.6; }
-  .case-meta div { display: grid; grid-template-columns: 4.5em 1fr; gap: 12px; padding: 7px 0; border-top: 1px solid rgba(17,17,17,.15); }
+  .case-meta { margin-top: 24px; display: grid; font-size: 16px; line-height: 1.65; }
+  .case-meta div { display: grid; grid-template-columns: 4.5em 1fr; gap: 12px; padding: 9px 0; border-top: 1px solid rgba(17,17,17,.15); }
   .case-meta div:last-child { border-bottom: 1px solid rgba(17,17,17,.15); }
   .case-meta dt { font-weight: 700; color: var(--blue); }
-  .case-desc { margin-top: 16px; font-size: 15px; line-height: 1.75; max-width: 34em; }
+  .case-desc { margin-top: 22px; font-size: 16px; line-height: 1.8; max-width: 34em; }
 
   /* 圖片像 Behance 一樣無縫往下接：沒有間距、沒有外框 */
   .case-gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-radius: 14px; overflow: hidden; }
