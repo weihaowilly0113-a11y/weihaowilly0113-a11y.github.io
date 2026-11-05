@@ -426,7 +426,12 @@
   /* 看作品時背景（包括頁首）維持原樣，只是被暗色蓋住，不做任何變動。
      頁面停止捲動時捲軸會消失，用同樣寬度的留白補回去，後面的文字就不會變寬、重新換行 */
   html.case-open body { padding-right: var(--sbw); }
-  html.case-open .site-header { padding-right: calc(var(--gutter) + var(--sbw)); }
+  html.case-open .site-header { right: var(--sbw); }   /* 頁首寬度不變，不會延伸到原本捲軸的位置 */
+  /* 原本捲軸的位置補一條淺灰，像捲軸軌道一樣，再一起被暗色蓋住 */
+  html.case-open body::after {
+    content: ""; position: fixed; top: 0; right: 0; bottom: 0; width: var(--sbw);
+    background: #F1F1F1; z-index: 299999;
+  }
   .case-layer { position: fixed; inset: 0; z-index: 300000; }
   .case-layer[hidden] { display: none; }
   .case-layer.no-anim .folder, .case-layer.no-anim .case-backdrop { animation: none !important; }
@@ -537,8 +542,7 @@
 
   /* 內容：固定欄位＋一段描述，下面全部是圖片 */
   /* 底部留白放在右欄裡面，而不是整個作品的外面：這樣左右兩欄一路延伸到最底，滑到底時左欄不會被往上推 */
-  /* 左右留白＝頁面留白 − 文件夾內縮：內容寬度跟作品列表完全一樣，介紹文字的換行位置也會一樣 */
-  .case { padding: var(--case-pad) calc(var(--gutter) - var(--fold-x)) 0; }
+  .case { padding: var(--case-pad) clamp(16px, 4vw, 56px) 0; }
   .case-main { padding-bottom: clamp(64px, 8vw, 110px); }
   .case[hidden] { display: none; }
   .folder-body::-webkit-scrollbar { display: none; }
@@ -559,7 +563,12 @@
   /* 左欄：名稱、標籤、介紹、基本資料、連結，捲動時停在原位；右欄：圖片 */
   .case-grid {
     display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);   /* 左欄加寬一點，文字行數變少、整欄變矮 */
-    gap: clamp(24px, 4vw, 64px); align-items: start;   /* 欄寬、欄距都跟作品列表相同 */
+    gap: clamp(24px, 4vw, 64px); align-items: start;
+  }
+  /* 電腦版：左欄寬度直接照作品列表的左欄算（頁面寬 − 兩側留白 − 欄距，取 5/12），
+     介紹文字的換行位置跟列表一樣；文件夾左右的留白則照舊，不會太貼邊 */
+  @media (min-width: 761px) {
+    .case-grid { grid-template-columns: calc((100vw - var(--sbw) - 2 * var(--gutter) - clamp(24px, 4vw, 64px)) * 5 / 12) minmax(0, 1fr); }
   }
   /* 左欄排得緊湊一點 */
   .case-side .tags { margin-top: 18px; }
