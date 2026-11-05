@@ -571,11 +571,13 @@
   .case-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
   .case-ext {
     font-weight: 700; font-size: 15px; text-decoration: none;
-    padding: 9px 18px; border-radius: 999px; background: var(--ink); color: var(--white);
-    transition: background-color .2s;
+    /* 跟作品列表的「看作品」同一種按鈕：群青底、白字；滑過去變成米白底、群青字 */
+    padding: 8px 17px; border-radius: 999px; border: 2px solid var(--blue);
+    background: var(--blue); color: var(--white);
+    transition: background-color .2s, color .2s;
   }
   .case-ext::after { content: " ↗"; }
-  .case-ext:hover { background: var(--blue); }
+  .case-ext:hover { background: var(--paper); color: var(--blue); }
   .case-meta { margin-top: 24px; display: grid; font-size: 16px; line-height: 1.65; }
   .case-meta div { display: grid; grid-template-columns: 4.5em 1fr; gap: 12px; padding: 9px 0; border-top: 1px solid rgba(17,17,17,.15); }
   .case-meta div:last-child { border-bottom: 1px solid rgba(17,17,17,.15); }
