@@ -532,7 +532,9 @@
   }
 
   /* 內容：固定欄位＋一段描述，下面全部是圖片 */
-  .case { padding: var(--case-pad) clamp(16px, 4vw, 56px) clamp(64px, 8vw, 110px); }
+  /* 底部留白放在右欄裡面，而不是整個作品的外面：這樣左右兩欄一路延伸到最底，滑到底時左欄不會被往上推 */
+  .case { padding: var(--case-pad) clamp(16px, 4vw, 56px) 0; }
+  .case-main { padding-bottom: clamp(64px, 8vw, 110px); }
   .case[hidden] { display: none; }
   .folder-body::-webkit-scrollbar { display: none; }
   .folder-body { touch-action: pan-y; }   /* 直向照常捲動，橫向交給左右滑動切換作品 */
