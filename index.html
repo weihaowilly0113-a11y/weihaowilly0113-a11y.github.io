@@ -493,10 +493,12 @@
   .folder-body {
     position: relative; z-index: 1; flex: 1; min-height: 0;
     overflow-y: auto; overscroll-behavior: contain;
+    scrollbar-width: none;   /* 隱藏捲軸；滑鼠滾輪、觸控板、鍵盤照常捲動 */
     background: var(--paper);
     border-radius: 0 28px 0 0;
   }
-  .folder { --case-pad: clamp(32px, 4vw, 56px); --title-size: clamp(40px, 5.2vw, 80px); }
+  /* 上方留白和標題大小同時看寬度和高度：螢幕比較矮時一起縮小，左欄才放得進一個畫面 */
+  .folder { --case-pad: clamp(24px, min(4vw, 5svh), 56px); --title-size: clamp(36px, min(4.6vw, 7.5svh), 72px); }
   /* 關閉：放在文件夾外、上方變暗的地方，跟內容分開，不會一直蓋在作品上 */
   .case-close {
     position: absolute; z-index: 3;
@@ -532,6 +534,7 @@
   /* 內容：固定欄位＋一段描述，下面全部是圖片 */
   .case { padding: var(--case-pad) clamp(16px, 4vw, 56px) clamp(64px, 8vw, 110px); }
   .case[hidden] { display: none; }
+  .folder-body::-webkit-scrollbar { display: none; }
   .folder-body { touch-action: pan-y; }   /* 直向照常捲動，橫向交給左右滑動切換作品 */
   .case.is-swiping { transition: none; }
   .case.is-snapping { transition: transform .25s cubic-bezier(.2,.8,.2,1), opacity .25s; }
@@ -548,25 +551,28 @@
   .swipe-hint.is-shown { opacity: 1; transform: translate(-50%, 0); }
   /* 左欄：名稱、標籤、介紹、基本資料、連結，捲動時停在原位；右欄：圖片 */
   .case-grid {
-    display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
-    gap: clamp(28px, 4vw, 72px); align-items: start;
+    display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);   /* 左欄加寬一點，文字行數變少、整欄變矮 */
+    gap: clamp(28px, 4vw, 64px); align-items: start;
   }
+  /* 左欄排得緊湊一點 */
+  .case-side .tags { margin-top: 14px; }
+  .case-side .tags li { font-size: 13px; padding: 7px 12px; }
   .case-side { position: sticky; top: var(--case-pad); }
   .case-title { font-weight: 900; font-size: var(--title-size); line-height: 1.1; outline: none; }
-  .case-sub { margin-top: 6px; font-weight: 700; color: var(--blue); }
-  .case-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+  .case-sub { margin-top: 4px; font-weight: 700; color: var(--blue); }
+  .case-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
   .case-ext {
     font-weight: 700; font-size: 15px; text-decoration: none;
-    padding: 10px 18px; border-radius: 999px; background: var(--ink); color: var(--white);
+    padding: 9px 18px; border-radius: 999px; background: var(--ink); color: var(--white);
     transition: background-color .2s;
   }
   .case-ext::after { content: " ↗"; }
   .case-ext:hover { background: var(--blue); }
-  .case-meta { margin-top: 28px; display: grid; }
-  .case-meta div { display: grid; grid-template-columns: 4.5em 1fr; gap: 12px; padding: 10px 0; border-top: 1px solid rgba(17,17,17,.15); }
+  .case-meta { margin-top: 18px; display: grid; font-size: 15px; line-height: 1.6; }
+  .case-meta div { display: grid; grid-template-columns: 4.5em 1fr; gap: 12px; padding: 7px 0; border-top: 1px solid rgba(17,17,17,.15); }
   .case-meta div:last-child { border-bottom: 1px solid rgba(17,17,17,.15); }
   .case-meta dt { font-weight: 700; color: var(--blue); }
-  .case-desc { margin-top: 24px; font-size: 16px; line-height: 1.85; max-width: 34em; }
+  .case-desc { margin-top: 16px; font-size: 15px; line-height: 1.75; max-width: 34em; }
 
   /* 圖片像 Behance 一樣無縫往下接：沒有間距、沒有外框 */
   .case-gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-radius: 14px; overflow: hidden; }
