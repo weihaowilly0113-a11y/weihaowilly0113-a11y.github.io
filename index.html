@@ -559,7 +559,6 @@
   /* 只有螢幕比較矮的筆電（可視高度 700px 以下）才收緊，讓左欄還是放得進一個畫面 */
   @media (min-width: 761px) and (max-height: 700px) {
     .case-side .tags { margin-top: 14px; }
-    .case-side .case-desc { margin-top: 16px; font-size: 15px; line-height: 1.75; }
     .case-side .case-meta { margin-top: 18px; font-size: 15px; line-height: 1.6; }
     .case-side .case-meta div { padding: 7px 0; }
     .case-side .case-links { margin-top: 18px; }
@@ -579,7 +578,14 @@
   .case-meta div { display: grid; grid-template-columns: 4.5em 1fr; gap: 12px; padding: 9px 0; border-top: 1px solid rgba(17,17,17,.15); }
   .case-meta div:last-child { border-bottom: 1px solid rgba(17,17,17,.15); }
   .case-meta dt { font-weight: 700; color: var(--blue); }
-  .case-desc { margin-top: 22px; font-size: 16px; line-height: 1.8; max-width: 34em; }
+  .case-desc { margin-top: 22px; max-width: 34em; }   /* 跟作品列表的介紹文字同樣大小，點進來不會突然變小 */
+  /* 電腦版：短的欄位兩兩並排（年份｜類型、團隊…），「我負責」獨佔一整列，整塊矮三分之一左右 */
+  @media (min-width: 761px) {
+    .case-meta { grid-template-columns: 1fr 1fr; }
+    /* 左邊那一欄的標籤寬度都一樣，數值會對齊同一條線 */
+    .case-meta div:nth-child(even):not(:last-child) { grid-template-columns: auto 1fr; gap: 14px; padding-left: 16px; border-left: 1px solid rgba(17,17,17,.15); }
+    .case-meta div:last-child, .case-meta div:nth-child(odd):nth-last-child(2) { grid-column: 1 / -1; }
+  }
 
   /* 圖片像 Behance 一樣無縫往下接：沒有間距、沒有外框 */
   .case-gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-radius: 14px; overflow: hidden; }
